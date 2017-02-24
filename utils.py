@@ -4,6 +4,7 @@
 This file include common used functions for converting file format to gff3
 '''
 from collections import OrderedDict
+import json
 
 
 def write_features(field, attribute, gff3):
@@ -49,3 +50,20 @@ def child_blocks(parent_field, parent_attr, gff3):
         child_attr['Parent'] = parent_attr['ID']
         write_features(child_field, child_attr, gff3)
         num = num + 1
+
+def add_tracks_to_json(trackList_json, new_tracks, modify_type):
+    with open(trackList_json, 'r+') as f:
+        data = json.load(f)
+        if modify_type == 'add_tracks':
+            data['tracks'].append(new_tracks)
+        elif modify_type == 'add_attr':
+            for k in new_tracks:
+                for track in data['tracks']:
+                    if k.lower() in track['urlTemplate'].lower():
+                        attr = new_tracks[k]
+                        for k, v in attr.items():
+                            track[k] = v
+        f.seek(0, 0)
+        f.write(json.dumps(data, separators=(',' , ':'), indent=4))
+        f.truncate()
+        f.close()
