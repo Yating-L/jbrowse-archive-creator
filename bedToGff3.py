@@ -56,7 +56,6 @@ class bedToGff3():
                 attribute['sequence of repeat unit element'] = li[15]
                 utils.write_features(field, attribute, gff3)
         gff3.close()
-        bed.close()
 
 
     def splicejunctions_to_gff3(self):
@@ -90,5 +89,4 @@ class bedToGff3():
                 utils.write_features(field, attribute, gff3)
                 utils.child_blocks(field, attribute, gff3)
         gff3.close()
-        bed.close()
         
