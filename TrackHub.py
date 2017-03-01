@@ -47,21 +47,21 @@ class TrackHub:
         except OSError as e:
             print "Cannot prepare reference error({0}): {1}".format(e.errno, e.strerror)
 
-    def addTrack(self, trackObject = None):
-        if trackObject.dataType == 'bam':
+    def addTrack(self, track):
+        if track.dataType == 'bam':
             json_file = os.path.join(self.json, "trackList.json")
             bam_track = dict()
             bam_track['type'] = 'JBrowse/View/Track/Alignments2'
-            bam_track['label'] = 'alignments'
-            bam_track['urlTemplate'] = os.path.join('../raw', trackObject.fileName)
+            bam_track['label'] = track.fileName
+            bam_track['urlTemplate'] = os.path.join('../raw', track.fileName)
             utils.add_tracks_to_json(json_file, bam_track, 'add_tracks')
             print "add bam track\n"
-        elif trackObject.dataType == 'bigwig':
+        elif track.dataType == 'bigwig':
             json_file = os.path.join(self.json, "trackList.json")
             bigwig_track = dict()
             bigwig_track['label'] = 'rnaseq'
             bigwig_track['key'] = 'RNA-Seq Coverage'
-            bigwig_track['urlTemplate'] = os.path.join('../raw', trackObject.fileName)
+            bigwig_track['urlTemplate'] = os.path.join('../raw', track.fileName)
             bigwig_track['type'] = 'JBrowse/View/Track/Wiggle/XYPlot'
             bigwig_track['variance_band'] = True
             bigwig_track['style'] = dict()
@@ -71,30 +71,16 @@ class TrackHub:
             bigwig_track['style']['height'] = 100
             utils.add_tracks_to_json(json_file, bigwig_track, 'add_tracks')
         else: 
-            gff3_file = os.path.join(self.raw, trackObject.fileName)
-            label = trackObject.fileName
-            if trackObject.dataType == 'bedSpliceJunctions':
+            gff3_file = os.path.join(self.raw, track.fileName)
+            label = track.fileName
+            if track.dataType == 'bedSpliceJunctions' or track.dataType == 'gtf':
                 p = subprocess.Popen([os.path.join(self.tool_dir, 'flatfile-to-json.pl'), '--gff', gff3_file, '--trackType', 'CanvasFeatures', '--trackLabel', label, '--config', '{"glyph": "JBrowse/View/FeatureGlyph/Segments"}', '--out', self.json])
+            elif track.dataType == 'gff3-transcript':
+                p = subprocess.Popen([os.path.join(self.tool_dir, 'flatfile-to-json.pl'), '--gff', gff3_file, '--trackType', 'CanvasFeatures', '--trackLabel', label, '--config', '{"transcriptType": "transcript"}', '--out', self.json])
             else:
                 p = subprocess.Popen([os.path.join(self.tool_dir, 'flatfile-to-json.pl'), '--gff', gff3_file, '--trackType', 'CanvasFeatures', '--trackLabel', label, '--out', self.json])
             p.communicate()
             
-            '''
-            if trackObject.dataType == 'gff3':
-                attr = dict()
-                track = dict()
-                attr['transcriptType'] = 'transcript'
-                track['Augustus'] = attr
-                json_file = os.path.join(self.json, "trackList.json")
-                utils.add_tracks_to_json(json_file, track, 'add_attr')
-            elif trackObject.dataType == 'bedSpliceJunctions':
-                attr = dict()
-                track = dict()
-                attr['glyph'] = 'JBrowse/View/FeatureGlyph/Segments'
-                track['regtools'] = attr
-                json_file = os.path.join(self.json, "trackList.json")
-                utils.add_tracks_to_json(json_file, track, 'add_attr')
-                '''
     def indexName(self):
         p = subprocess.Popen([os.path.join(self.tool_dir, 'generate-names.pl'), '-v', '--out', self.json])
         p.communicate()

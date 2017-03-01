@@ -5,6 +5,9 @@ This file include common used functions for converting file format to gff3
 '''
 from collections import OrderedDict
 import json
+import subprocess
+import os
+import tempfile
 
 
 def write_features(field, attribute, gff3):
@@ -21,6 +24,26 @@ def write_features(field, attribute, gff3):
         attr.append(s)
     gff3.write(';'.join(attr))
     gff3.write('\n')
+
+def getChromSizes(reference, tool_dir):
+    faToTwoBit = os.path.join(tool_dir, 'faToTwoBit')
+    twoBitInfo = os.path.join(tool_dir, 'twoBitInfo')
+    try:
+        twoBitFile = tempfile.NamedTemporaryFile(bufsize=0)
+        chrom_sizes = tempfile.NamedTemporaryFile(bufsize=0, suffix='.chrom.sizes', delete=False)
+    except IOError as err:
+        print "Cannot create tempfile err({0}): {1}".format(err.errno, err.strerror)
+    try:
+        p = subprocess.Popen([faToTwoBit, reference, twoBitFile.name])
+        p.communicate()
+    except OSError as err:
+        print "Cannot generate twoBitFile from faToTwoBit err({0}): {1}".format(err.errno, err.strerror)
+    try:
+        p = subprocess.Popen([twoBitInfo, twoBitFile.name, chrom_sizes.name])
+        p.communicate()
+    except OSError as err:
+        print "Cannot generate chrom_sizes from twoBitInfo err({0}): {1}".format(err.errno, err.strerror)
+    return chrom_sizes
 
 def sequence_region(chrom_sizes):
     '''

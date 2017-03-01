@@ -32,12 +32,10 @@ def main(argv):
     # tblastn alignment (blastxml)
     parser.add_argument('--blastxml', action='append', help='blastxml format from tblastn')
 
-    # chromsize file (tab)
-    parser.add_argument('--chromsize', help='Chrome size file')
-
     # BAM format
     parser.add_argument('--bam', action='append', help='BAM format from HISAT')
-    parser.add_argument('--bai', action='append', help='BAM index format from HISAT')
+    # put bam index file at the same directory with bam file
+    # parser.add_argument('--bai', action='append', help='BAM index format from HISAT') 
 
     # BIGWIG format
     parser.add_argument('--bigwig', action='append', help='BIGWIG format to show rnaseq coverage')
@@ -51,10 +49,9 @@ def main(argv):
 
     reference = args.fasta
     out_path = args.out
-    chrom_size = args.chromsize
     tool_directory = 'JBrowse-1.12.1/bin'
+    chrom_size = utils.getChromSizes(reference, '../ucsc_tools_340_for_HAC')
     array_inputs_bam = args.bam
-    array_inputs_bai = args.bai
     array_inputs_bed_simple_repeats = args.bedSimpleRepeats
     array_inputs_bed_splice_junctions = args.bedSpliceJunctions
     array_inputs_bigwig = args.bigwig
@@ -62,8 +59,6 @@ def main(argv):
     array_inputs_gtf = args.gtf
     if array_inputs_bam:
         all_datatype_dictionary['bam'] = array_inputs_bam
-    if array_inputs_bai:
-        all_datatype_dictionary['bai'] = array_inputs_bai
     if array_inputs_bed_simple_repeats:
         all_datatype_dictionary['bedSimpleRepeats'] = array_inputs_bed_simple_repeats
     if array_inputs_bed_splice_junctions:
@@ -86,7 +81,7 @@ def main(argv):
             print 'Cannot open', datatype
         else:
             for f in inputfiles:
-                track = trackObject.trackObject(f, datatype, chrom_size)
+                track = trackObject.trackObject(f, datatype, chrom_size.name)
                 track.addToRaw()
                 all_tracks.append(track)
     print reference

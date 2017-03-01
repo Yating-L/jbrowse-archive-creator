@@ -23,6 +23,8 @@ class trackObject:
     def addToRaw(self):
         des_path = os.path.join(self.raw_folder, self.fileName)
         if self.dataType == 'gff3' or self.dataType == 'fasta' or self.dataType == 'bam' or self.dataType == 'bigwig' or self.dataType == 'bai':
+            if self.dataType == 'gff3':
+                self.checkGff3()
             try:
                 shutil.copyfile(self.dataFile, des_path)
             except shutil.Error as err1:
@@ -38,3 +40,13 @@ class trackObject:
         elif self.dataType == 'gtf':
             utils.gtfToGff3(self.dataFile, des_path, self.chrom_size)
 
+    def checkGff3(self):
+        with open(self.dataFile, 'r') as f:
+            for line in f:
+                if not line.startswith('#'):
+                    seq_type = line.rstrip().split('\t')[2]
+                    if seq_type == 'transcript':
+                        self.dataType = 'gff3-transcript'
+                        break
+                    if seq_type == 'mRNA':
+                        break
