@@ -57,6 +57,7 @@ def main(argv):
     array_inputs_bigwig = args.bigwig
     array_inputs_gff3 = args.gff3
     array_inputs_gtf = args.gtf
+    array_inputs_blastxml = args.blastxml
     if array_inputs_bam:
         all_datatype_dictionary['bam'] = array_inputs_bam
     if array_inputs_bed_simple_repeats:
@@ -69,6 +70,8 @@ def main(argv):
         all_datatype_dictionary['gff3'] = array_inputs_gff3
     if array_inputs_gtf:
         all_datatype_dictionary['gtf'] = array_inputs_gtf
+    if array_inputs_blastxml:
+        all_datatype_dictionary['blastxml'] = array_inputs_blastxml
     
     print all_datatype_dictionary
 
@@ -84,7 +87,7 @@ def main(argv):
                 track = trackObject.trackObject(f, datatype, chrom_size.name)
                 track.addToRaw()
                 all_tracks.append(track)
-    print reference
+
     jbrowseHub = TrackHub.TrackHub(all_tracks, reference, out_path, tool_directory)
     jbrowseHub.createHub()
             
