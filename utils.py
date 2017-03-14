@@ -26,6 +26,7 @@ def write_features(field, attribute, gff3):
     gff3.write('\n')
 
 def getChromSizes(reference, tool_dir):
+    #TODO: find a better way instead of shipping the two exec files with the tool
     faToTwoBit = os.path.join(tool_dir, 'faToTwoBit')
     twoBitInfo = os.path.join(tool_dir, 'twoBitInfo')
     try:
@@ -34,12 +35,12 @@ def getChromSizes(reference, tool_dir):
     except IOError as err:
         print "Cannot create tempfile err({0}): {1}".format(err.errno, err.strerror)
     try:
-        p = subprocess.Popen([faToTwoBit, reference, twoBitFile.name])
+        p = subprocess.Popen(['faToTwoBit', reference, twoBitFile.name])
         p.communicate()
     except OSError as err:
         print "Cannot generate twoBitFile from faToTwoBit err({0}): {1}".format(err.errno, err.strerror)
     try:
-        p = subprocess.Popen([twoBitInfo, twoBitFile.name, chrom_sizes.name])
+        p = subprocess.Popen(['twoBitInfo', twoBitFile.name, chrom_sizes.name])
         p.communicate()
     except OSError as err:
         print "Cannot generate chrom_sizes from twoBitInfo err({0}): {1}".format(err.errno, err.strerror)
@@ -142,3 +143,10 @@ def gtfToGff3(gtf_file, gff3_file, chrom_sizes):
                 attribute['coverage'] = attr_li[3].split()[1].strip('"')
             write_features(field, attribute, gff3)
     gff3.close()
+
+def sanitize_name_path(input_path):
+    '''
+    Galaxy will name all the files and dirs as *.dat, 
+    the function is simply replacing '.' to '_' for the dirs
+    '''
+    return input_path.replace('.', '_')

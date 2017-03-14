@@ -1,0 +1,9 @@
+categories: [Visualization]
+description: A tool to create a JBrowse hub
+name: jbrowse_hub
+owner: yating-l
+remote_repository_url: https://github.com/Yating-L/jbrowse_hub
+exclude:
+  - tool_test_output.html
+  - tool_test_output.json
+  - README.md

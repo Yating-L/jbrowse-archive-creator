@@ -1,0 +1,177 @@
+<tool id="jbrowse_hub" name="JBrowse Hub Creator" version="1.0">
+    <description>
+        This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse
+    </description>
+
+    <requirements>
+        <requirement type="package" version="1.9">numpy</requirement>
+        <requirement type="package" version="1.68">biopython</requirement>
+        <requirement type="package" version="1.0">ucsc_tools_340</requirement>
+        <requirement type="package" version="1.12.1">jbrowse_tools</requirement>
+    </requirements>
+
+    <stdio>
+    </stdio>
+
+    <command detect_errors="exit_code"><![CDATA[
+        python $__tool_directory__/jbrowse_hub.py 
+        --fasta '$reference' 
+        #for $f in $format
+            #if $f.formatChoice.format_select == 'bed'
+                #if $f.formatChoice.bedChoice.bed_select == 'bed_simple_repeats_option'
+                    --bedSimpleRepeats $f.formatChoice.bedChoice.BED_simple_repeats
+                #elif $f.formatChoice.bedChoice.bed_select == 'bed_splice_junctions_option'
+                    --bedSpliceJunctions $f.formatChoice.bedChoice.BED_splice_junctions
+                #end if
+            #end if
+            #if $f.formatChoice.format_select == 'bam'
+                --bam $f.formatChoice.BAM
+            #end if
+            #if $f.formatChoice.format_select == 'bai'
+                --bai $f.formatChoice.BAI
+            #end if
+            #if $f.formatChoice.format_select == 'gff3_transcript'
+                --gff3_transcript $f.formatChoice.GFF3_transcript
+            #end if
+            #if $f.formatChoice.format_select == 'gff3_mrna'
+                --gff3_mrna $f.formatChoice.GFF3_mrna
+            #end if
+            #if $f.formatChoice.format_select == 'blastxml'
+                --blastxml $f.formatChoice.BlastXML
+            #end if
+            #if $f.formatChoice.format_select == 'gtf'
+                --gtf $f.formatChoice.GTF
+            #end if
+            #if $f.formatChoice.format_select == 'bigwig'
+                --bigwig $f.formatChoice.BIGWIG
+            #end if
+       #end for
+        --genome_name '$genome_name'
+        -e '$output.extra_files_path'
+        -o '$output'
+    ]]></command>
+
+    <inputs>
+        <param name="reference" type="data" format="fasta" label="Reference Genome" />
+        <param name="genome_name" type="text" size="30" value="unknown" label="Genome name" />
+            <repeat name="format" title="New track">
+                <conditional name="formatChoice">
+                    <param name="format_select" type="select" label="Format">
+                        <option value="bam" selected="true">BAM</option>
+                        <option value="bai">BAI (BAM index)</option>
+                        <option value="bed">BED</option>
+                        <option value="blastxml">BLASTXML</option>
+                        <option value="bigwig">BIGWIG</option>
+                        <option value="gff3_transcript">GFF3 (structure: gene->transcript->CDS)</option>
+                        <option value="gff3_mrna">GFF3 (structure: gene->mRNA->CDS)</option>
+                        <option value="gtf">GTF</option>
+                    </param>
+
+                    <when value="bam">
+                        <param
+                                format="bam"
+                                name="BAM"
+                                type="data"
+                                label="BAM File"
+                        />
+                    </when>  
+                    <when value="bai">
+                        <param
+                                format="bai"
+                                name="BAI"
+                                type="data"
+                                label="BAI File"
+                        />
+                    </when>     
+                    <when value="bed">
+                        <conditional name="bedChoice">
+                            <param name="bed_select" type="select" label="Bed Choice">
+                                <option value="bed_simple_repeats_option">BED Simple repeat (bed4+12 / simpleRepeat.as)</option>
+                                <option value="bed_splice_junctions_option">BED Splice junctions (bed12+1 / spliceJunctions.as)</option>
+                            </param>
+                            <when value="bed_simple_repeats_option">
+                                <param
+                                        format="bed"
+                                        name="BED_simple_repeats"
+                                        type="data"
+                                        label="Bed Simple Repeats (Bed4+12) File"
+                                />
+                            </when>
+                            <when value="bed_splice_junctions_option">
+                                <param
+                                        format="bed"
+                                        name="BED_splice_junctions"
+                                        type="data"
+                                        label="Bed Splice Junctions (Bed12+1) File"
+                                />
+                            </when>
+                        </conditional>
+                    </when>
+                    <when value="blastxml">
+                        <param
+                                format="blastxml"
+                                name="BlastXML"
+                                type="data"
+                                label="Blast Alignments File"
+                        />
+                    </when>
+                    <when value="bigwig">
+                        <param
+                                format="bigwig"
+                                name="BIGWIG"
+                                type="data"
+                                label="BIGWIG File"
+                        />
+                    </when>
+                    <when value="gff3_transcript">
+                        <param
+                                format="gff3"
+                                name="GFF3_transcript"
+                                type="data"
+                                label="GFF3 File"
+                        />
+                    </when>
+                    <when value="gff3_mrna">
+                        <param
+                                format="gff3"
+                                name="GFF3_mrna"
+                                type="data"
+                                label="GFF3 File"
+                        />
+                    </when>
+                    <when value="gtf">
+                        <param
+                                format="gtf"
+                                name="GTF"
+                                type="data"
+                                label="GTF File"
+                        />
+                    </when>  
+            </conditional>
+        </repeat>
+    </inputs>
+
+    <outputs>
+        <data format="html" name="output" label="${tool.name}" />
+    </outputs>
+    <tests>
+        <test>
+            <param name="reference" value="dbia3/raw/dbia3.fa" />
+            <param name="output" value="hubtest" />
+            <repeat name="format">
+                <conditional name="formatChoice">
+                    <param name="format_select" value="gff3_transcript"/>
+                    <param name="GFF3_transcript" value="dbia3/raw/Augustus_on_data_3__GTF_GFF.gff3" />
+                </conditional>
+            </repeat>
+            <output name="output" file="hubtest" >
+            </output>
+        </test>
+    </tests>
+    <help>
+        This Galaxy tool will create a tar file which including raw datasets and json datasets that can be used for
+        JBrowse visualization.
+    </help>
+    <citations>
+    </citations>
+</tool>
