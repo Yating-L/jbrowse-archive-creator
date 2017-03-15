@@ -4,6 +4,7 @@
     </description>
 
     <requirements>
+        <requirement type="package" version="1.2">samtools</requirement>
         <requirement type="package" version="1.9">numpy</requirement>
         <requirement type="package" version="1.68">biopython</requirement>
         <requirement type="package" version="1.0">ucsc_tools_340</requirement>
@@ -26,9 +27,6 @@
             #end if
             #if $f.formatChoice.format_select == 'bam'
                 --bam $f.formatChoice.BAM
-            #end if
-            #if $f.formatChoice.format_select == 'bai'
-                --bai $f.formatChoice.BAI
             #end if
             #if $f.formatChoice.format_select == 'gff3_transcript'
                 --gff3_transcript $f.formatChoice.GFF3_transcript
@@ -58,7 +56,6 @@
                 <conditional name="formatChoice">
                     <param name="format_select" type="select" label="Format">
                         <option value="bam" selected="true">BAM</option>
-                        <option value="bai">BAI (BAM index)</option>
                         <option value="bed">BED</option>
                         <option value="blastxml">BLASTXML</option>
                         <option value="bigwig">BIGWIG</option>
@@ -73,14 +70,6 @@
                                 name="BAM"
                                 type="data"
                                 label="BAM File"
-                        />
-                    </when>  
-                    <when value="bai">
-                        <param
-                                format="bai"
-                                name="BAI"
-                                type="data"
-                                label="BAI File"
                         />
                     </when>     
                     <when value="bed">

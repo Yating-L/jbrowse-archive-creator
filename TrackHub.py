@@ -54,26 +54,24 @@ class TrackHub:
     #TODO: hard coded the bam and bigwig tracks. Need to allow users to customize the settings
     def addTrack(self, track):
         if track['dataType'] == 'bam':
+            self.createTrackList()
             json_file = os.path.join(self.json, "trackList.json")
             bam_track = dict()
             bam_track['type'] = 'JBrowse/View/Track/Alignments2'
+            bam_track['storeClass'] = 'JBrowse/Store/SeqFeature/BAM'
             bam_track['label'] = track['fileName']
             bam_track['urlTemplate'] = os.path.join('../raw', track['fileName'])
+            bam_track['baiUrlTemplate'] = os.path.join('../raw', track['index'])
             utils.add_tracks_to_json(json_file, bam_track, 'add_tracks')
             print "add bam track\n"
         elif track['dataType'] == 'bigwig':
+            self.createTrackList()
             json_file = os.path.join(self.json, "trackList.json")
             bigwig_track = dict()
-            bigwig_track['label'] = 'rnaseq'
-            bigwig_track['key'] = 'RNA-Seq Coverage'
+            bigwig_track['label'] = track['fileName']
             bigwig_track['urlTemplate'] = os.path.join('../raw', track['fileName'])
             bigwig_track['type'] = 'JBrowse/View/Track/Wiggle/XYPlot'
-            bigwig_track['variance_band'] = True
-            bigwig_track['style'] = dict()
-            bigwig_track['style']['pos_color'] = '#FFA600'
-            bigwig_track['style']['neg_color'] = '#005EFF'
-            bigwig_track['style']['clip_marker_color'] = 'red'
-            bigwig_track['style']['height'] = 100
+            bigwig_track['storeClass'] = 'JBrowse/Store/SeqFeature/BigWig'
             utils.add_tracks_to_json(json_file, bigwig_track, 'add_tracks')
         else: 
             gff3_file = os.path.join(self.raw, track['fileName'])
@@ -116,6 +114,13 @@ class TrackHub:
                         
             #htmlstr = htmlstr % zipfile
             htmlfile.write(htmlstr)
+
+    def createTrackList(self):
+        trackList = os.path.join(self.json, "trackList.json")
+        if not os.path.exists(trackList):
+            os.mknod(trackList)
+            #open(trackList,'w').close()
+            
 
    
 

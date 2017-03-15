@@ -5,6 +5,8 @@ import shutil
 import utils
 import bedToGff3
 import blastxmlToGff3
+import tempfile
+import subprocess
 
 class trackObject:
     def __init__(self, chrom_size, genome, extra_files_path):
@@ -28,9 +30,21 @@ class trackObject:
         Convert gff3, BED, blastxml and gtf files into gff3 files 
         and store converted files in folder 'raw'
         '''
+        
         fileName = os.path.basename(dataFile)
         des_path = os.path.join(self.raw_folder, fileName)
+        track = {}
         if dataType == 'gff3_mrna' or dataType == 'gff3_transcript' or dataType == 'fasta' or dataType == 'bam' or dataType == 'bigwig' or dataType == 'bai':
+            if dataType == 'bam':
+                # JBrowse will raise error: not a BAM file if the filename hasn't .bam extension
+                fileName = os.path.basename(dataFile) + '.bam'
+                des_path = os.path.join(self.raw_folder, fileName)
+                bam_index = utils.createBamIndex(dataFile)
+                indexname = os.path.basename(bam_index)
+                des_path_for_index = os.path.join(self.raw_folder, indexname)
+                shutil.copyfile(bam_index, des_path_for_index)  
+                track['index'] = indexname
+
             try:
                 shutil.copyfile(dataFile, des_path)
             except shutil.Error as err1:
@@ -45,10 +59,8 @@ class trackObject:
             blastxmlToGff3.blastxml2gff3(dataFile, des_path)
         elif dataType == 'gtf':
             utils.gtfToGff3(dataFile, des_path, self.chrom_size)
-        track = {
-            'fileName': fileName,
-            'dataType': dataType
-        }
+        track['fileName'] = fileName
+        track['dataType'] = dataType
         self.tracks.append(track)
 
 

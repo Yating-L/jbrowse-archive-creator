@@ -150,3 +150,12 @@ def sanitize_name_path(input_path):
     the function is simply replacing '.' to '_' for the dirs
     '''
     return input_path.replace('.', '_')
+
+def createBamIndex(bamfile):
+    p = subprocess.Popen(['samtools', 'index', bamfile])
+    p.communicate()
+    filename = bamfile + '.bai'
+    if os.path.exists(filename):
+        return filename
+    else:
+        raise ValueError('Did not find bai file')
