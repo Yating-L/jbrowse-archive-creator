@@ -98,6 +98,8 @@ def gff3_writer(blast_records, gff3_file):
                 attribute['ID'] = field['seqid'] + '_' + str(field['start']) + '_' + str(field['end']) + '_' + query_name + '_' + str(target_start) + '_' + str(target_end)
                 attribute['Target'] = query_name + " " + str(target_start) + " " + str(target_end)
                 attribute['Gap'] = align2cigar(query, ref)
+                #store the query sequence in the file in order to display alignment with BlastAlignment plugin
+                attribute['query'] = hsp.query
                 # show reading frame attribute only if the frame is not (0, 0)
                 if hsp.frame[0] != 0 or hsp.frame[1] != 0:
                     attribute['reading_frame'] = str(hsp.frame[0]) + ", " + str(hsp.frame[1])
