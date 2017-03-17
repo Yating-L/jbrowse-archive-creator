@@ -7,14 +7,14 @@ import utils
 
 
 def align2cigar(hsp_query, hsp_reference):
-    '''
+    """
         Build CIGAR representation from an hsp_query
         input:
             hsp_query
             hsp_sbjct
         output:
             CIGAR string
-    '''
+    """
     query = hsp_query
     ref = hsp_reference
     # preType, curType:

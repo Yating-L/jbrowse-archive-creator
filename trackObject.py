@@ -5,15 +5,14 @@ import shutil
 import utils
 import bedToGff3
 import blastxmlToGff3
-import tempfile
-import subprocess
+
 
 class trackObject:
     def __init__(self, chrom_size, genome, extra_files_path):
         self.chrom_size = chrom_size
         outputDirect = os.path.join(extra_files_path, genome)
         self.raw_folder = os.path.join(outputDirect, 'raw')
-        print self.raw_folder
+        #Store metadata of the tracks
         self.tracks = []
         try:
             if os.path.exists(self.raw_folder):
@@ -25,11 +24,11 @@ class trackObject:
         except OSError as oserror:
             print "Cannot create raw folder error({0}): {1}".format(oserror.errno, oserror.strerror)
 
-    def addToRaw(self, dataFile, dataType):
-        '''
+    def addToRaw(self, dataFile, dataType, metaData):
+        """
         Convert gff3, BED, blastxml and gtf files into gff3 files 
         and store converted files in folder 'raw'
-        '''
+        """
         
         fileName = os.path.basename(dataFile)
         des_path = os.path.join(self.raw_folder, fileName)
@@ -61,18 +60,20 @@ class trackObject:
             utils.gtfToGff3(dataFile, des_path, self.chrom_size)
         track['fileName'] = fileName
         track['dataType'] = dataType
+        self.SetMetadata(track, metaData)
         self.tracks.append(track)
 
-
-
-'''
-    def checkGff3(self, dataFile, dataType):
-        with open(dataFile, 'r') as f:
-            for line in f:
-                if not line.startswith('#'):
-                    seq_type = line.rstrip().split('\t')[2]
-                    if seq_type == 'transcript':
-                        return 'gff3-transcript'
-                    if seq_type == 'mRNA':
-                        return 'gff3'
-'''
+    #If the metadata is not set, use the default value
+    def SetMetadata(self, track, metaData):
+        track.update(metaData)
+        if 'name' not in metaData.keys() or track['name'] == '':
+            track['name'] = track['fileName']
+        if 'label' not in metaData.keys() or track['label'] == '':
+            track['label'] = track['name']
+        if 'track_color' not in metaData.keys() or track['track_color'] == '':
+            track['track_color'] = "#daa520"
+        if track['dataType'] == 'bigwig':
+            if 'pos_color' not in metaData.keys() or track['pos_color'] == '':
+                track['pos_color'] = "#FFA600"
+            if 'neg_color' not in metaData.keys() or track['neg_color'] == '':
+                track['neg_color'] = "#005EFF"

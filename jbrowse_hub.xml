@@ -17,36 +17,80 @@
     <command detect_errors="exit_code"><![CDATA[
         python $__tool_directory__/jbrowse_hub.py 
         --fasta '$reference' 
+        --genome_name '$genome_name'
+
+        ## json metadata recording from Remi's hub-archive-creator.xml
+        #import json
+        #set global data_parameter_dict = {}
+
+        ## Function to retrieve the data of the inputs
+        #def prepare_json($input_to_prepare, $extra_data_dict={})
+            #set false_path = str($input_to_prepare)
+            #set name = $input_to_prepare.name
+
+            #set data_dict = {"name": $name}
+            #silent data_dict.update($extra_data_dict)
+
+            #silent $data_parameter_dict.update({$false_path: $data_dict})
+
+        #end def
+
+
         #for $f in $format
+            #set track_label =  str($f.formatChoice.label)
+            #set extra_data_dict = {"label" : $track_label} 
             #if $f.formatChoice.format_select == 'bed'
+                #set track_color = str($f.formatChoice.track_color)
+                #silent extra_data_dict.update({"track_color" : $track_color})
                 #if $f.formatChoice.bedChoice.bed_select == 'bed_simple_repeats_option'
                     --bedSimpleRepeats $f.formatChoice.bedChoice.BED_simple_repeats
+                    #silent $prepare_json($f.formatChoice.bedChoice.BED_simple_repeats, extra_data_dict)
                 #elif $f.formatChoice.bedChoice.bed_select == 'bed_splice_junctions_option'
                     --bedSpliceJunctions $f.formatChoice.bedChoice.BED_splice_junctions
+                    #silent $prepare_json($f.formatChoice.bedChoice.BED_splice_junctions, extra_data_dict)
                 #end if
             #end if
             #if $f.formatChoice.format_select == 'bam'
                 --bam $f.formatChoice.BAM
+                #silent $prepare_json($f.formatChoice.BAM, extra_data_dict)
             #end if
-            #if $f.formatChoice.format_select == 'gff3_transcript'
-                --gff3_transcript $f.formatChoice.GFF3_transcript
-            #end if
-            #if $f.formatChoice.format_select == 'gff3_mrna'
-                --gff3_mrna $f.formatChoice.GFF3_mrna
+            #if $f.formatChoice.format_select == 'gff3'
+                #set track_color = str($f.formatChoice.track_color)
+                #silent extra_data_dict.update({"track_color" : $track_color})
+                #if $f.formatChoice.gff3Choice.gff3_select == 'gff3_transcript'
+                    --gff3_transcript $f.formatChoice.gff3Choice.GFF3_transcript
+                    #silent $prepare_json($f.formatChoice.gff3Choice.GFF3_transcript, extra_data_dict)
+                #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_mrna'
+                    --gff3_mrna $f.formatChoice.gff3Choice.GFF3_mrna
+                    #silent $prepare_json($f.formatChoice.gff3Choice.GFF3_mrna, extra_data_dict)
+                #end if
             #end if
             #if $f.formatChoice.format_select == 'blastxml'
                 --blastxml $f.formatChoice.BlastXML
+                #set track_color = str($f.formatChoice.track_color)
+                #silent extra_data_dict.update({"track_color" : $track_color})
+                #silent $prepare_json($f.formatChoice.BlastXML, extra_data_dict)
             #end if
             #if $f.formatChoice.format_select == 'gtf'
                 --gtf $f.formatChoice.GTF
+                #set track_color = str($f.formatChoice.track_color)
+                #silent extra_data_dict.update({"track_color" : $track_color})
+                #silent $prepare_json($f.formatChoice.GTF, extra_data_dict)
             #end if
             #if $f.formatChoice.format_select == 'bigwig'
                 --bigwig $f.formatChoice.BIGWIG
+                #set pos_color = str($f.formatChoice.pos_color)
+                #set neg_color = str($f.formatChoice.neg_color)
+                #silent $extra_data_dict.update({"pos_color" : $pos_color, "neg_color" : $neg_color})
+                #silent $prepare_json($f.formatChoice.BIGWIG, extra_data_dict)
             #end if
        #end for
-        --genome_name '$genome_name'
-        -e '$output.extra_files_path'
-        -o '$output'
+
+       #set all_data_json = json.dumps($data_parameter_dict)
+       -j '$all_data_json'
+       -e '$output.extra_files_path'
+       -o '$output'
+
     ]]></command>
 
     <inputs>
@@ -59,8 +103,7 @@
                         <option value="bed">BED</option>
                         <option value="blastxml">BLASTXML</option>
                         <option value="bigwig">BIGWIG</option>
-                        <option value="gff3_transcript">GFF3 (structure: gene->transcript->CDS)</option>
-                        <option value="gff3_mrna">GFF3 (structure: gene->mRNA->CDS)</option>
+                        <option value="gff3">GFF3</option>
                         <option value="gtf">GTF</option>
                     </param>
 
@@ -71,6 +114,7 @@
                                 type="data"
                                 label="BAM File"
                         />
+                        <param name="label" type="text" size="30" value = "Sequence Alignment" label="Track name" />
                     </when>     
                     <when value="bed">
                         <conditional name="bedChoice">
@@ -95,6 +139,14 @@
                                 />
                             </when>
                         </conditional>
+                        <param name="label" type="text" size="30" value="BED file" label="Track name" />
+                        <param name="track_color" type="color" label="Track color" value="#daa520">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
                     </when>
                     <when value="blastxml">
                         <param
@@ -103,6 +155,14 @@
                                 type="data"
                                 label="Blast Alignments File"
                         />
+                        <param name="label" type="text" size="30" value="Blast Alignment" label="Track name" />
+                        <param name="track_color" type="color" label="Track color" value="#daa520">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
                     </when>
                     <when value="bigwig">
                         <param
@@ -111,22 +171,53 @@
                                 type="data"
                                 label="BIGWIG File"
                         />
+                        <param name="label" type="text" size="30" value="Sequence Coverage" label="Track name" />
+                        <param name="pos_color" type="color" label="Positive Coverage Color" value="#FFA600">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
+                        <param name="neg_color" type="color" label="Negative Coverage Color" value="#005EFF">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
                     </when>
-                    <when value="gff3_transcript">
-                        <param
-                                format="gff3"
-                                name="GFF3_transcript"
-                                type="data"
-                                label="GFF3 File"
-                        />
-                    </when>
-                    <when value="gff3_mrna">
-                        <param
-                                format="gff3"
-                                name="GFF3_mrna"
-                                type="data"
-                                label="GFF3 File"
-                        />
+                    <when value="gff3">
+                        <conditional name="gff3Choice">
+                            <param name="gff3_select" type="select" label="gff3 type">
+                                <option value="gff3_transcript">GFF3 format, structure: gene->transcription->CDS</option>
+                                <option value="gff3_mrna">GFF3 format, structure: gene->mRNA->CDS</option>
+                            </param>
+                            <when value="gff3_transcript">
+                                <param
+                                        format="gff3"
+                                        name="GFF3_transcript"
+                                        type="data"
+                                        label="GFF3 File"
+                                />
+                            </when>
+                            <when value="gff3_mrna">
+                                <param
+                                        format="gff3"
+                                        name="GFF3_mrna"
+                                        type="data"
+                                        label="GFF3 File"
+                                />
+                            </when>
+                        </conditional>
+                        <param name="label" type="text" size="30" value="Gene Prediction" label="Track name" />
+                        <param name="track_color" type="color" label="Track color" value="#daa520">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
                     </when>
                     <when value="gtf">
                         <param
@@ -135,6 +226,14 @@
                                 type="data"
                                 label="GTF File"
                         />
+                        <param name="label" type="text" size="30" value="Assembled Transcripts" label="Track name" />
+                        <param name="track_color" type="color" label="Track color" value="#daa520">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
                     </when>  
             </conditional>
         </repeat>

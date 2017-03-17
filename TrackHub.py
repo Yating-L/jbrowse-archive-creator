@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 
 import os
-import trackObject
-import utils
 import subprocess
-import string
 import shutil
-import tempfile
+import utils
 
-#TODO: package JBrowse file conversion .pl files
 
 class TrackHub:
     def __init__(self, inputFiles, reference, outputDirect, tool_dir, genome, extra_files_path):
@@ -21,10 +17,6 @@ class TrackHub:
         self.raw = os.path.join(self.out_path, 'raw')
         self.json = os.path.join(self.out_path, 'json')
         try: 
-            if not self.out_path:
-                raise ValueError('empty output path\n')
-            if not os.path.exists(self.out_path):
-                raise ValueError('the output folder has not been created')
             if os.path.exists(self.json):
                 shutil.rmtree(self.json)
             os.makedirs(self.json)
@@ -39,7 +31,6 @@ class TrackHub:
             self.addTrack(input_file)
         self.indexName()
         self.makeArchive()
-        #shutil.rmtree(self.out_path)
         self.outHtml()
         print "Success!\n"
     
@@ -53,37 +44,44 @@ class TrackHub:
             print "Cannot prepare reference error({0}): {1}".format(e.errno, e.strerror)
     #TODO: hard coded the bam and bigwig tracks. Need to allow users to customize the settings
     def addTrack(self, track):
+        track_label = track['label']
+        track_color = track['track_color']
+        if track['dataType'] == 'blastxml':
+            track_type = "G-OnRamp_plugin/BlastAlignment"
+        elif track['dataType'] == 'gff3_transcript' or track['dataType'] == 'gff3_mrna':
+            track_type = "G-OnRamp_plugin/GenePred"
+        else:
+            track_type = "CanvasFeatures"
         if track['dataType'] == 'bam':
             self.createTrackList()
             json_file = os.path.join(self.json, "trackList.json")
             bam_track = dict()
             bam_track['type'] = 'JBrowse/View/Track/Alignments2'
             bam_track['storeClass'] = 'JBrowse/Store/SeqFeature/BAM'
-            bam_track['label'] = track['fileName']
+            bam_track['label'] = track_label
             bam_track['urlTemplate'] = os.path.join('../raw', track['fileName'])
             bam_track['baiUrlTemplate'] = os.path.join('../raw', track['index'])
             utils.add_tracks_to_json(json_file, bam_track, 'add_tracks')
-            print "add bam track\n"
+           # print "add bam track\n"
         elif track['dataType'] == 'bigwig':
             self.createTrackList()
             json_file = os.path.join(self.json, "trackList.json")
             bigwig_track = dict()
-            bigwig_track['label'] = track['fileName']
+            bigwig_track['label'] = track_label
+            #color_setting = {"pos_color" : track['pos_color'], "neg_color" : track['neg_color']} 
+            bigwig_track['style'] = {"pos_color" : track['pos_color'], "neg_color" : track['neg_color']} 
             bigwig_track['urlTemplate'] = os.path.join('../raw', track['fileName'])
             bigwig_track['type'] = 'JBrowse/View/Track/Wiggle/XYPlot'
             bigwig_track['storeClass'] = 'JBrowse/Store/SeqFeature/BigWig'
             utils.add_tracks_to_json(json_file, bigwig_track, 'add_tracks')
         else: 
             gff3_file = os.path.join(self.raw, track['fileName'])
-            label = track['fileName']
             if track['dataType'] == 'bedSpliceJunctions' or track['dataType'] == 'gtf':
-                p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', 'CanvasFeatures', '--trackLabel', label, '--config', '{"glyph": "JBrowse/View/FeatureGlyph/Segments"}', '--out', self.json])
+                p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', track_type, '--trackLabel', track_label, '--Config', '{"glyph": "JBrowse/View/FeatureGlyph/Segments"}', '--clientConfig', '{"color" : "%s"}' % track_color, '--out', self.json])
             elif track['dataType'] == 'gff3_transcript':
-                p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', 'MyPlugin/GenePred', '--trackLabel', label, '--config', '{"transcriptType": "transcript"}', '--out', self.json])
-            elif track['dataType'] == 'gff3_mrna':
-                p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', 'MyPlugin/GenePred', '--trackLabel', label, '--out', self.json])
+                p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', track_type, '--trackLabel', track_label, '--Config', '{"transcriptType": "transcript"}', '--clientConfig', '{"color" : "%s"}' % track_color, '--out', self.json])
             else:
-                p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', 'CanvasFeatures', '--trackLabel', label, '--out', self.json])
+                p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', track_type, '--trackLabel', track_label, '--clientConfig', '{"color" : "%s"}' % track_color, '--out', self.json])
             p.communicate()
             
     def indexName(self):
@@ -98,7 +96,6 @@ class TrackHub:
     #TODO: this will list all zip files in the filedir and sub-dirs. worked in Galaxy but all list zip files in test-data when
     #run it locally. May need modify
     def outHtml(self):
-        #htmloutput = tempfile.NamedTemporaryFile(self.outfile, suffix = '.html', bufsize=0, delete=False)
         with open(self.outfile, 'w') as htmlfile:
             htmlstr = 'The JBrowse Hub is created: <br>'
             zipfiles = '<li><a href = "%s">Download</a></li>'
@@ -112,15 +109,13 @@ class TrackHub:
                         relative_file_path = os.path.join(relative_directory, file)
                         htmlstr += zipfiles % relative_file_path
                         
-            #htmlstr = htmlstr % zipfile
             htmlfile.write(htmlstr)
 
     def createTrackList(self):
         trackList = os.path.join(self.json, "trackList.json")
         if not os.path.exists(trackList):
             os.mknod(trackList)
-            #open(trackList,'w').close()
-            
+
 
    
 

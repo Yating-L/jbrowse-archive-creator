@@ -1,22 +1,19 @@
 #!/usr/bin/env python
 
-import os
 import sys
 import argparse
-import subprocess
-from bedToGff3 import bedToGff3
-import blastxmlToGff3
+import json
 import utils
-import tempfile
 import trackObject
 import TrackHub
-import shutil
+
+
 
 def main(argv):
     parser = argparse.ArgumentParser(description='Create a hub to display in jbrowse.')
 
     # Reference genome mandatory
-    parser.add_argument('-f', '--fasta', help='Fasta file of the reference genome')
+    parser.add_argument('-f', '--fasta', help='Fasta file of the reference genome (Required)')
 
     # Genome name
     parser.add_argument('-g', '--genome_name', help='Name of reference genome')
@@ -25,7 +22,10 @@ def main(argv):
     parser.add_argument('-o', '--out', help='output html')
 
     # Output folder
-    parser.add_argument('-e', '--extra_files_path', help="Directory of JBrowse Hub folder")
+    parser.add_argument('-e', '--extra_files_path', help='Directory of JBrowse Hub folder')
+
+    #Tool Directory
+    parser.add_argument('-d', '--tool_directory', help='The directory of JBrowse file convertion scripts and UCSC tools')
 
     # GFF3 structure: gene->transcription->CDS
     parser.add_argument('--gff3_transcript', action='append', help='GFF3 format, structure: gene->transcription->CDS')
@@ -51,25 +51,47 @@ def main(argv):
     # GTF format
     parser.add_argument('--gtf', action='append', help='GTF format from StringTie')
 
+    # Metadata json format
+    parser.add_argument('-j', '--data_json', help='Json containing the metadata of the inputs')
+
     args = parser.parse_args()
     all_datatype_dictionary = dict()
     
 
+    if not args.fasta:
+        parser.print_help()
+        raise RuntimeError("No reference genome\n")
     reference = args.fasta
     genome = 'unknown'
-    out_path = '.'
+    out_path = 'unknown.html'
     extra_files_path = '.'
+    tool_directory = '.'
     if args.genome_name:
-        genome = utils.sanitize_name_path(args.genome_name)
+        genome = args.genome_name
     if args.out:
         out_path = args.out
     if args.extra_files_path:
-        extra_files_path = utils.sanitize_name_path(args.extra_files_path)
-    cwd = os.getcwd()
+        extra_files_path = args.extra_files_path
+
     #tool_directory not work for Galaxy tool, all tools need to exist in the current PATH, deal with it with tool dependencies
-    tool_directory = os.path.join(cwd, 'JBrowse-1.12.1/bin')
+    if args.tool_directory:
+        tool_directory = args.tool_directory
+
+    #Calculate chromsome sizes using genome reference and uscs tools
     chrom_size = utils.getChromSizes(reference, tool_directory)
-    all_tracks = trackObject.trackObject(chrom_size.name, genome, extra_files_path) #store converted files in the array: all_tracks.tracks
+
+    #get metadata from json file
+    json_inputs_data = args.data_json
+    if json_inputs_data:
+        inputs_data = json.loads(json_inputs_data)
+    else:
+        inputs_data = {}
+    
+    #print inputs_data
+
+    #Initate trackObject
+    all_tracks = trackObject.trackObject(chrom_size.name, genome, extra_files_path) 
+    
     array_inputs_bam = args.bam
     array_inputs_bed_simple_repeats = args.bedSimpleRepeats
     array_inputs_bed_splice_junctions = args.bedSpliceJunctions
@@ -78,6 +100,7 @@ def main(argv):
     array_inputs_gff3_mrna = args.gff3_mrna
     array_inputs_gtf = args.gtf
     array_inputs_blastxml = args.blastxml
+
     if array_inputs_bam:
         all_datatype_dictionary['bam'] = array_inputs_bam
     if array_inputs_bed_simple_repeats:
@@ -95,7 +118,7 @@ def main(argv):
     if array_inputs_blastxml:
         all_datatype_dictionary['blastxml'] = array_inputs_blastxml
     
-    print all_datatype_dictionary
+    print "input tracks: \n", all_datatype_dictionary
 
     for datatype, inputfiles in all_datatype_dictionary.items():
         try:
@@ -105,11 +128,25 @@ def main(argv):
             print 'Cannot open', datatype
         else:
             for f in inputfiles:
-                all_tracks.addToRaw(f, datatype)
+                metadata = {}
+                #print f
+                if f in inputs_data.keys():
+                    metadata = inputs_data[f]
+                    print metadata
+                #Convert tracks into gff3 format
+                all_tracks.addToRaw(f, datatype, metadata)
 
     jbrowseHub = TrackHub.TrackHub(all_tracks, reference, out_path, tool_directory, genome, extra_files_path)
     jbrowseHub.createHub()
-         
+
+"""        
+def extractMetadata(array_inputs, inputs_data):
+    metadata_dict = {}
+    for input_false_path in array_inputs:
+        for key, data_value in inputs_data.items():
+            if key == input_false_path:
+                metadata_dict[input_false_path]
+"""
 
 if __name__ == "__main__":
     main(sys.argv)

@@ -8,6 +8,9 @@
     </package>
     <package name="biopython" version="1.68">
         <readme>
+This package is based on package_biopython_1_67 owned by biopython. 
+https://toolshed.g2.bx.psu.edu/repository?user_id=fd5c6d0f82f315d8
+
 This Galaxy Tool Shed package installs Biopython from source, having
 first installed NumPy which is a build time depencency. This requires
 and assumes a standard C compiler is already installed, along with
