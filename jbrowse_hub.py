@@ -128,15 +128,15 @@ def main(argv):
             print 'Cannot open', datatype
         else:
             for f in inputfiles:
-                metadata = {}
+                #metadata = {}
                 #print f
-                if f in inputs_data.keys():
-                    metadata = inputs_data[f]
-                    print metadata
+                #if f in inputs_data.keys():
+                   # metadata = inputs_data[f]
+                    #print metadata
                 #Convert tracks into gff3 format
-                all_tracks.addToRaw(f, datatype, metadata)
+                all_tracks.addToRaw(f, datatype)
 
-    jbrowseHub = TrackHub.TrackHub(all_tracks, reference, out_path, tool_directory, genome, extra_files_path)
+    jbrowseHub = TrackHub.TrackHub(all_tracks, reference, out_path, tool_directory, genome, extra_files_path, inputs_data)
     jbrowseHub.createHub()
 
 """        

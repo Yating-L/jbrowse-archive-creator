@@ -35,13 +35,14 @@
 
         #end def
 
-
-        #for $f in $format
+        #for $g in $group
+        #for $f in $g.format
             #set track_label =  str($f.formatChoice.label)
-            #set extra_data_dict = {"label" : $track_label} 
+            #set group_name = str($g.group_name)
+            #set extra_data_dict = {"label" : $track_label, "category" : $group_name} 
             #if $f.formatChoice.format_select == 'bed'
                 #set track_color = str($f.formatChoice.track_color)
-                #silent extra_data_dict.update({"track_color" : $track_color})
+                #silent extra_data_dict.update({"color" : $track_color})
                 #if $f.formatChoice.bedChoice.bed_select == 'bed_simple_repeats_option'
                     --bedSimpleRepeats $f.formatChoice.bedChoice.BED_simple_repeats
                     #silent $prepare_json($f.formatChoice.bedChoice.BED_simple_repeats, extra_data_dict)
@@ -56,7 +57,7 @@
             #end if
             #if $f.formatChoice.format_select == 'gff3'
                 #set track_color = str($f.formatChoice.track_color)
-                #silent extra_data_dict.update({"track_color" : $track_color})
+                #silent extra_data_dict.update({"color" : $track_color})
                 #if $f.formatChoice.gff3Choice.gff3_select == 'gff3_transcript'
                     --gff3_transcript $f.formatChoice.gff3Choice.GFF3_transcript
                     #silent $prepare_json($f.formatChoice.gff3Choice.GFF3_transcript, extra_data_dict)
@@ -68,22 +69,23 @@
             #if $f.formatChoice.format_select == 'blastxml'
                 --blastxml $f.formatChoice.BlastXML
                 #set track_color = str($f.formatChoice.track_color)
-                #silent extra_data_dict.update({"track_color" : $track_color})
+                #silent extra_data_dict.update({"color" : $track_color})
                 #silent $prepare_json($f.formatChoice.BlastXML, extra_data_dict)
             #end if
             #if $f.formatChoice.format_select == 'gtf'
                 --gtf $f.formatChoice.GTF
                 #set track_color = str($f.formatChoice.track_color)
-                #silent extra_data_dict.update({"track_color" : $track_color})
+                #silent extra_data_dict.update({"color" : $track_color})
                 #silent $prepare_json($f.formatChoice.GTF, extra_data_dict)
             #end if
             #if $f.formatChoice.format_select == 'bigwig'
                 --bigwig $f.formatChoice.BIGWIG
                 #set pos_color = str($f.formatChoice.pos_color)
                 #set neg_color = str($f.formatChoice.neg_color)
-                #silent $extra_data_dict.update({"pos_color" : $pos_color, "neg_color" : $neg_color})
+                #silent $extra_data_dict.update({"style" : {"pos_color" : $pos_color, "neg_color" : $neg_color}})
                 #silent $prepare_json($f.formatChoice.BIGWIG, extra_data_dict)
             #end if
+       #end for
        #end for
 
        #set all_data_json = json.dumps($data_parameter_dict)
@@ -96,6 +98,8 @@
     <inputs>
         <param name="reference" type="data" format="fasta" label="Reference Genome" />
         <param name="genome_name" type="text" size="30" value="unknown" label="Genome name" />
+        <repeat name="group" title="New group">
+            <param type="text" name="group_name" label="Group name" value="Default group"/>
             <repeat name="format" title="New track">
                 <conditional name="formatChoice">
                     <param name="format_select" type="select" label="Format">
@@ -235,7 +239,8 @@
                             </sanitizer>
                         </param>
                     </when>  
-            </conditional>
+                </conditional>
+            </repeat>
         </repeat>
     </inputs>
 
@@ -246,11 +251,14 @@
         <test>
             <param name="reference" value="dbia3/raw/dbia3.fa" />
             <param name="output" value="hubtest" />
-            <repeat name="format">
-                <conditional name="formatChoice">
-                    <param name="format_select" value="gff3_transcript"/>
-                    <param name="GFF3_transcript" value="dbia3/raw/Augustus_on_data_3__GTF_GFF.gff3" />
-                </conditional>
+            <repeat name="group">
+                <param name="group_name" value="Default group"/>
+                <repeat name="format">
+                    <conditional name="formatChoice">
+                        <param name="format_select" value="gff3_transcript"/>
+                        <param name="GFF3_transcript" value="dbia3/raw/Augustus_on_data_3__GTF_GFF.gff3" />
+                    </conditional>
+                </repeat>
             </repeat>
             <output name="output" file="hubtest" >
             </output>
