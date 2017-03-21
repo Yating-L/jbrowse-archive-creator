@@ -58,7 +58,7 @@ class TrackHub:
             self.BigWig(track, metadata)
         else: 
             gff3_file = os.path.join(self.raw, track['fileName'])
-            if track['dataType'] == 'bedSpliceJunctions' or track['dataType'] == 'gtf':
+            if track['dataType'] == 'bedSpliceJunctions' or track['dataType'] == 'gtf' or track['dataType'] == 'blastxml':
                 p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"glyph": "JBrowse/View/FeatureGlyph/Segments", "category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
             elif track['dataType'] == 'gff3_transcript':
                 p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"transcriptType": "transcript", "category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])

@@ -45,35 +45,54 @@ def align2cigar(hsp_query, hsp_reference):
     return ' '.join(cigar)
 
 def gff3_writer(blast_records, gff3_file):
-    gff3 = open(gff3_file, 'w')
+    gff3 = open(gff3_file, 'a')
     gff3.write("##gff-version 3\n")
     seq_regions = dict()
     for blast_record in blast_records:
         query_name = blast_record.query.split(" ")[0]
         source = blast_record.application
+        method = blast_record.matrix
         for alignment in blast_record.alignments:
+            group = {
+            "parent_field" : OrderedDict(),
+            "parent_attribute" : OrderedDict(),
+            "alignments" : []
+            }
             title = alignment.title.split(" ")
-            seqid = title[len(title) - 1]
+            contig_name = title[len(title) - 1]
             length = alignment.length
-            feature_type = 'match'
+            group['parent_field']['seqid'] = contig_name
+            group['parent_field']['source'] = source
+            group['parent_field']['type'] = 'match'
+            group['parent_attribute']['ID'] = contig_name + '_' + query_name
+            group['parent_attribute']['method'] = method
+            group['parent_attribute']['length'] = length
+            if contig_name not in seq_regions:
+                gff3.write("##sequence-region " + contig_name + ' 1 ' + str(length) + '\n')
+                seq_regions[contig_name] = length
+            match_num = 0
+            coords = [length, 0]
             for hsp in alignment.hsps:
+                hsp_align = {}
                 field = OrderedDict()
                 attribute = OrderedDict()
                 ref = hsp.sbjct
                 query = hsp.query
-                field['seqid'] = seqid
+                field['seqid'] = contig_name
                 field['source'] = source
-                field['type'] = feature_type
-                if seqid not in seq_regions:
-                    gff3.write("##sequence-region " + field['seqid'] + ' 1 ' + str(length) + '\n')
-                    seq_regions[seqid] = length
+                field['type'] = 'match_part'
+                
                 field['start'] = hsp.sbjct_start
+                if field['start'] < coords[0]:
+                    coords[0] = field['start']
                 ref_length = len(ref.replace('-', ''))
                 # if run tblastn, the actual length of reference should be multiplied by 3
                 if source.lower() == "tblastn":
                     ref_length *= 3
                 field['end'] = field['start'] + ref_length - 1
-                field['score'] = hsp.expect
+                if field['end'] > coords[1]:
+                    coords[1] = field['end']
+                field['score'] = hsp.score
                 #decide if the alignment in the same strand or reverse strand
                 #reading frame
                 # (+, +), (0, 0), (-, -) => +
@@ -95,21 +114,40 @@ def gff3_writer(blast_records, gff3_file):
                 if source.lower() == "blastx":
                     target_len *= 3
                 target_end = target_start + target_len -1
-                attribute['ID'] = field['seqid'] + '_' + str(field['start']) + '_' + str(field['end']) + '_' + query_name + '_' + str(target_start) + '_' + str(target_end)
+                attribute['ID'] = group['parent_attribute']['ID'] + '_match_' + str(match_num)
+                attribute['Parent'] = group['parent_attribute']['ID']
                 attribute['Target'] = query_name + " " + str(target_start) + " " + str(target_end)
                 attribute['Gap'] = align2cigar(query, ref)
-                #store the query sequence in the file in order to display alignment with BlastAlignment plugin
+                #store the query sequence and match string in the file in order to display alignment with BlastAlignment plugin
+                attribute['subject'] = hsp.sbjct
                 attribute['query'] = hsp.query
+                attribute['match'] = hsp.match
+                attribute['gaps'] = attribute['match'].count(' ')
+                similar = attribute['match'].count('+')
+                attribute['identities'] = len(attribute['match']) - similar - attribute['gaps']
+                attribute['positives'] = attribute['identities'] + similar
+                attribute['expect'] = hsp.expect
                 # show reading frame attribute only if the frame is not (0, 0)
-                if hsp.frame[0] != 0 or hsp.frame[1] != 0:
-                    attribute['reading_frame'] = str(hsp.frame[0]) + ", " + str(hsp.frame[1])
-                utils.write_features(field, attribute, gff3)
+                attribute['frame'] = hsp.frame[1]
+                match_num += 1
+                hsp_align['field'] = field
+                hsp_align['attribute'] = attribute
+                group['alignments'].append(hsp_align)
+            group['parent_field']['start'] = coords[0]
+            group['parent_field']['end'] = coords[1]
+            group['parent_field']['score'] = group['parent_field']['strand'] = group['parent_field']['phase'] = '.'
+            group['parent_attribute']['match_num'] = match_num
+            utils.write_features(group['parent_field'], group['parent_attribute'], gff3)
+            for align in group['alignments']:
+                utils.write_features(align['field'], align['attribute'], gff3)
+    gff3.close()
+
 
 def blastxml2gff3(xml_file, gff3_file):
     result_handle = open(xml_file)
     blast_records = NCBIXML.parse(result_handle)
     gff3_writer(blast_records, gff3_file)
-    
+
 if __name__ == "__main__":
-    blastxml2gff3("../tblastn_dmel.blastxml", "gff3.txt")
+    blastxml2gff3("../dbia3/raw/tblastn_dmel-hits-translation-r6.11.fa_vs_nucleotide_BLAST_database_from_data_3.blastxml", "gff3.txt")
 
