@@ -3,9 +3,11 @@
     <package name="samtools" version="1.2">
         <repository name="package_samtools_1_2" owner="iuc" prior_installation_required="True"/>
     </package>
+
     <package name="numpy" version="1.9">
         <repository name="package_numpy_1_9" owner="iuc" prior_installation_required="True" />
     </package>
+
     <package name="biopython" version="1.68">
         <readme>
 This package is based on package_biopython_1_67 owned by biopython. 
@@ -45,6 +47,7 @@ The PYTHONPATH for biopython can be accessed through PYTHONPATH_BIOPYTHON.
             </actions>
         </install>
     </package>
+    
      <package name="ucsc_tools_340" version="1.0">
         <install version="1.0">
             <actions_group>
@@ -66,19 +69,22 @@ The PYTHONPATH for biopython can be accessed through PYTHONPATH_BIOPYTHON.
         <install version="1.0">
             <actions_group>
                 <actions architecture="x86_64" os="linux">
-                    <action type="download_by_url">http://old-gep.wustl.edu/~galaxy/jbrowse_tools.tar.gz</action>
+                    <action type="download_by_url">http://jbrowse.org/wordpress/wp-content/plugins/download-monitor/download.php?id=105</action>
                     <action type="make_directory">$INSTALL_DIR/jbrowse</action>
+                    <action type="shell_command">
+                        ./setup.sh
+                    </action>
                     <action type="move_directory_files">
                         <source_directory>.</source_directory>                       
                         <destination_directory>$INSTALL_DIR/jbrowse</destination_directory>
                     </action>    
+                    <action type="set_environment">
+                        <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/jbrowse</environment_variable>
+                        <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/jbrowse/bin</environment_variable>
+                        <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/jbrowse/src</environment_variable>
+                        <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/jbrowse/extlib</environment_variable>
+                    </action>
                 </actions>
-                <action type="set_environment">
-                    <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/jbrowse</environment_variable>
-                    <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/jbrowse/bin</environment_variable>
-                    <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/jbrowse/src</environment_variable>
-                    <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/jbrowse/extlib</environment_variable>
-                </action>
             </actions_group>
          </install>
          <readme>The perl scripts for converting flat files to json.</readme>
