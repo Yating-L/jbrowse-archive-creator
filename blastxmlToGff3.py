@@ -137,11 +137,17 @@ def gff3_writer(blast_records, gff3_file):
             group['parent_field']['end'] = coords[1]
             group['parent_field']['score'] = group['parent_field']['strand'] = group['parent_field']['phase'] = '.'
             group['parent_attribute']['match_num'] = match_num
+            group['alignments'].sort(key=lambda x: (x['field']['start'], x['field']['end']))
             utils.write_features(group['parent_field'], group['parent_attribute'], gff3)
+            prev_end = -1
             for align in group['alignments']:
+                overlap = ''
+                if align['field']['start'] <= prev_end:
+                    overlap += str(align['field']['start']) + ',' + str(prev_end)
+                prev_end = align['field']['end']
+                align['attribute']['overlap'] = overlap
                 utils.write_features(align['field'], align['attribute'], gff3)
     gff3.close()
-
 
 def blastxml2gff3(xml_file, gff3_file):
     result_handle = open(xml_file)

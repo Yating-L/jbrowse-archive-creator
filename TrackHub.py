@@ -116,8 +116,6 @@ class TrackHub:
         self.createTrackList()
         json_file = os.path.join(self.json, "trackList.json")
         bigwig_track = dict()
-        #color_setting = {"pos_color" : track['pos_color'], "neg_color" : track['neg_color']} 
-        #bigwig_track['style'] = {"pos_color" : track['pos_color'], "neg_color" : track['neg_color']} 
         bigwig_track['urlTemplate'] = os.path.join('../raw', track['fileName'])
         bigwig_track['type'] = 'JBrowse/View/Track/Wiggle/XYPlot'
         bigwig_track['storeClass'] = 'JBrowse/Store/SeqFeature/BigWig'
@@ -128,8 +126,6 @@ class TrackHub:
 
     #If the metadata is not set, use the default value
     def SetMetadata(self, track, metadata):
-        #print metadata
-        #track.update(metadata)
         if 'label' not in metadata.keys() or metadata['label'] == '':
             metadata['label'] = track['fileName']
         if 'color' not in metadata.keys() or metadata['color'] == '':
