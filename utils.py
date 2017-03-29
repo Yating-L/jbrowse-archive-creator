@@ -35,13 +35,11 @@ def getChromSizes(reference, tool_dir):
     except IOError as err:
         print "Cannot create tempfile err({0}): {1}".format(err.errno, err.strerror)
     try:
-        p = subprocess.Popen(['faToTwoBit', reference, twoBitFile.name])
-        p.communicate()
+        subprocess.call(['faToTwoBit', reference, twoBitFile.name])
     except OSError as err:
         print "Cannot generate twoBitFile from faToTwoBit err({0}): {1}".format(err.errno, err.strerror)
     try:
-        p = subprocess.Popen(['twoBitInfo', twoBitFile.name, chrom_sizes.name])
-        p.communicate()
+        subprocess.call(['twoBitInfo', twoBitFile.name, chrom_sizes.name])
     except OSError as err:
         print "Cannot generate chrom_sizes from twoBitInfo err({0}): {1}".format(err.errno, err.strerror)
     return chrom_sizes
@@ -155,8 +153,7 @@ def sanitize_name(input_name):
     return "gonramp_" + sanitized_name
 
 def createBamIndex(bamfile):
-    p = subprocess.Popen(['samtools', 'index', bamfile])
-    p.communicate()
+    subprocess.call(['samtools', 'index', bamfile])
     filename = bamfile + '.bai'
     if os.path.exists(filename):
         return filename

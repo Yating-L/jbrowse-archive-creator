@@ -38,9 +38,7 @@ class TrackHub:
     def prepareRefseq(self):
         try:
             #print os.path.join(self.tool_dir, 'prepare-refseqs.pl') + ", '--fasta', " + self.reference +", '--out', self.json])"
-            p = subprocess.Popen(['prepare-refseqs.pl', '--fasta', self.reference, '--out', self.json])
-            # Wait for process to terminate.
-            p.communicate()
+            subprocess.call(['prepare-refseqs.pl', '--fasta', self.reference, '--out', self.json])
         except OSError as e:
             print "Cannot prepare reference error({0}): {1}".format(e.errno, e.strerror)
     #TODO: hard coded the bam and bigwig tracks. Need to allow users to customize the settings
@@ -59,21 +57,30 @@ class TrackHub:
         else: 
             gff3_file = os.path.join(self.raw, track['fileName'])
             if track['dataType'] == 'bedSpliceJunctions' or track['dataType'] == 'gtf' or track['dataType'] == 'blastxml':
-                p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"glyph": "JBrowse/View/FeatureGlyph/Segments", "category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
+                subprocess.call(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"glyph": "JBrowse/View/FeatureGlyph/Segments", "category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
             elif track['dataType'] == 'gff3_transcript':
-                p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"transcriptType": "transcript", "category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
+                subprocess.call(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"transcriptType": "transcript", "category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
             else:
-                p = subprocess.Popen(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
-            p.communicate()
+                subprocess.call(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
             
     def indexName(self):
-        p = subprocess.Popen(['generate-names.pl', '-v', '--out', self.json])
-        p.communicate()
+        subprocess.call(['generate-names.pl', '-v', '--out', self.json])
         print "finished name index \n"
 
     def makeArchive(self):
-        shutil.make_archive(self.out_path, 'zip', self.out_path)  
-        shutil.rmtree(self.out_path) 
+        shutil.make_archive(self.out_path, 'zip', self.out_path)
+        data_folder = '/var/www/html/JBrowse-1.12.1/jbrowse_hub'
+        try:
+            if os.path.exists(data_folder):
+                if os.path.isdir(data_folder):
+                    shutil.rmtree(data_folder)
+                else:
+                    os.remove(data_folder)
+        except OSError as oserror:
+            print "Cannot create data folder({0}): {1}".format(oserror.errno, oserror.strerror)
+        shutil.copytree(self.out_path, data_folder)
+        subprocess.call(['chmod', '-R', 'o+rx', '/var/www/html/JBrowse-1.12.1/jbrowse_hub'])
+        shutil.rmtree(self.out_path)
     
     #TODO: this will list all zip files in the filedir and sub-dirs. worked in Galaxy but all list zip files in test-data when
     #run it locally. May need modify
@@ -81,6 +88,7 @@ class TrackHub:
         with open(self.outfile, 'w') as htmlfile:
             htmlstr = 'The JBrowse Hub is created: <br>'
             zipfiles = '<li><a href = "%s">Download</a></li>'
+            jbrowse_hub = '<li><a href = "http://192.168.56.11/JBrowse-1.12.1/index.html?data=jbrowse_hub/json" target="_blank">View JBrowse Hub</a></li>'
             filedir_abs = os.path.abspath(self.outfile)
             filedir = os.path.dirname(filedir_abs)
             filedir = os.path.join(filedir, self.outfolder)
@@ -90,7 +98,7 @@ class TrackHub:
                         relative_directory = os.path.relpath(root, filedir)
                         relative_file_path = os.path.join(relative_directory, file)
                         htmlstr += zipfiles % relative_file_path
-                        
+            htmlstr += jbrowse_hub
             htmlfile.write(htmlstr)
 
     def createTrackList(self):
