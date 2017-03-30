@@ -3,6 +3,7 @@
 import os
 import subprocess
 import shutil
+import json
 import utils
 
 
@@ -55,13 +56,15 @@ class TrackHub:
         elif track['dataType'] == 'bigwig':
             self.BigWig(track, metadata)
         else: 
-            gff3_file = os.path.join(self.raw, track['fileName'])
-            if track['dataType'] == 'bedSpliceJunctions' or track['dataType'] == 'gtf' or track['dataType'] == 'blastxml':
-                subprocess.call(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"glyph": "JBrowse/View/FeatureGlyph/Segments", "category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
+            flat_file = os.path.join(self.raw, track['fileName'])
+            if track['dataType'] == 'bed':
+                subprocess.call(['flatfile-to-json.pl', '--bed', flat_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
+            elif track['dataType'] == 'bedSpliceJunctions' or track['dataType'] == 'gtf' or track['dataType'] == 'blastxml':
+                subprocess.call(['flatfile-to-json.pl', '--gff', flat_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"glyph": "JBrowse/View/FeatureGlyph/Segments", "category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
             elif track['dataType'] == 'gff3_transcript':
-                subprocess.call(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"transcriptType": "transcript", "category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
+                subprocess.call(['flatfile-to-json.pl', '--gff', flat_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"transcriptType": "transcript", "category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
             else:
-                subprocess.call(['flatfile-to-json.pl', '--gff', gff3_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
+                subprocess.call(['flatfile-to-json.pl', '--gff', flat_file, '--trackType', metadata['type'], '--trackLabel', metadata['label'], '--Config', '{"category" : "%s"}' % metadata['category'], '--clientConfig', '{"color" : "%s"}' % metadata['color'], '--out', self.json])
             
     def indexName(self):
         subprocess.call(['generate-names.pl', '-v', '--out', self.json])
@@ -88,7 +91,7 @@ class TrackHub:
         with open(self.outfile, 'w') as htmlfile:
             htmlstr = 'The JBrowse Hub is created: <br>'
             zipfiles = '<li><a href = "%s">Download</a></li>'
-            jbrowse_hub = '<li><a href = "http://192.168.56.11/JBrowse-1.12.1/index.html?data=jbrowse_hub/json" target="_blank">View JBrowse Hub</a></li>'
+            jbrowse_hub = '<li><a href = ":80/JBrowse-1.12.1/index.html?data=jbrowse_hub/json" target="_blank">View JBrowse Hub</a></li>'
             filedir_abs = os.path.abspath(self.outfile)
             filedir = os.path.dirname(filedir_abs)
             filedir = os.path.join(filedir, self.outfolder)
@@ -117,8 +120,11 @@ class TrackHub:
         bam_track['baiUrlTemplate'] = os.path.join('../raw', track['index'])
         bam_track['label'] = metadata['label']
         bam_track['category'] = metadata['category']
-        utils.add_tracks_to_json(json_file, bam_track, 'add_tracks')
-
+        bam_track = json.dumps(bam_track)
+        #Use add-track-json.pl to add bam track to json file
+        new_track = subprocess.Popen(['echo', bam_track], stdout=subprocess.PIPE)
+        subprocess.call(['add-track-json.pl', json_file], stdin=new_track.stdout)
+    
     def BigWig(self, track, metadata):
         #create trackList.json if not exist
         self.createTrackList()
@@ -130,7 +136,11 @@ class TrackHub:
         bigwig_track['label'] = metadata['label']
         bigwig_track['style'] = metadata['style']
         bigwig_track['category'] = metadata['category']
-        utils.add_tracks_to_json(json_file, bigwig_track, 'add_tracks')
+        bigwig_track = json.dumps(bigwig_track)
+        #Use add-track-json.pl to add bigwig track to json file
+        new_track = subprocess.Popen(['echo', bigwig_track], stdout=subprocess.PIPE)
+        #output = new_track.communicate()[0]
+        subprocess.call(['add-track-json.pl', json_file], stdin=new_track.stdout)
 
     #If the metadata is not set, use the default value
     def SetMetadata(self, track, metadata):
@@ -142,9 +152,9 @@ class TrackHub:
             if 'style' not in metadata.keys():
                 metadata['style'] = {}
             if 'pos_color' not in metadata['style'] or metadata['style']['pos_color'] == '':
-                metadata['pos_color'] = "#FFA600"
+                metadata['style']['pos_color'] = "#FFA600"
             if 'neg_color' not in metadata['style'] or metadata['style']['neg_color'] == '':
-                metadata['neg_color'] = "#005EFF"
+                metadata['style']['neg_color'] = "#005EFF"
         if 'category' not in metadata.keys() or metadata['category'] == '':
             metadata['category'] = "Default group"
         if track['dataType'] == 'blastxml':

@@ -27,11 +27,17 @@ def main(argv):
     #Tool Directory
     parser.add_argument('-d', '--tool_directory', help='The directory of JBrowse file convertion scripts and UCSC tools')
 
+    #GFF3
+    parser.add_argument('--gff3', action='append', help='GFF3 format')
+
     # GFF3 structure: gene->transcription->CDS
-    parser.add_argument('--gff3_transcript', action='append', help='GFF3 format, structure: gene->transcription->CDS')
+    parser.add_argument('--gff3_transcript', action='append', help='GFF3 format for gene prediction, structure: gene->transcription->CDS')
 
     # GFF3 structure: gene->mRNA->CDS
-    parser.add_argument('--gff3_mrna', action='append', help='GFF3 format, structure: gene->mRNA->CDS')
+    parser.add_argument('--gff3_mrna', action='append', help='GFF3 format for gene prediction, structure: gene->mRNA->CDS')
+
+    # generic BED 
+    parser.add_argument('--bed', action='append', help='BED format')
 
     # trfBig simple repeats (BED 4+12)
     parser.add_argument('--bedSimpleRepeats', action='append', help='BED 4+12 format, using simpleRepeats.as')
@@ -93,9 +99,11 @@ def main(argv):
     all_tracks = trackObject.trackObject(chrom_size.name, genome, extra_files_path) 
     
     array_inputs_bam = args.bam
+    array_inputs_bed = args.bed
     array_inputs_bed_simple_repeats = args.bedSimpleRepeats
     array_inputs_bed_splice_junctions = args.bedSpliceJunctions
     array_inputs_bigwig = args.bigwig
+    array_inputs_gff3 = args.gff3
     array_inputs_gff3_transcript = args.gff3_transcript
     array_inputs_gff3_mrna = args.gff3_mrna
     array_inputs_gtf = args.gtf
@@ -103,12 +111,16 @@ def main(argv):
 
     if array_inputs_bam:
         all_datatype_dictionary['bam'] = array_inputs_bam
+    if array_inputs_bed:
+        all_datatype_dictionary['bed'] = array_inputs_bed
     if array_inputs_bed_simple_repeats:
         all_datatype_dictionary['bedSimpleRepeats'] = array_inputs_bed_simple_repeats
     if array_inputs_bed_splice_junctions:
         all_datatype_dictionary['bedSpliceJunctions'] = array_inputs_bed_splice_junctions
     if array_inputs_bigwig:
         all_datatype_dictionary['bigwig'] = array_inputs_bigwig
+    if array_inputs_gff3:
+        all_datatype_dictionary['gff3'] = array_inputs_gff3
     if array_inputs_gff3_transcript:
         all_datatype_dictionary['gff3_transcript'] = array_inputs_gff3_transcript
     if array_inputs_gff3_mrna:

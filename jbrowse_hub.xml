@@ -42,8 +42,11 @@
             #set extra_data_dict = {"label" : $track_label, "category" : $group_name} 
             #if $f.formatChoice.format_select == 'bed'
                 #set track_color = str($f.formatChoice.track_color)
+                #if $f.formatChoice.bedChoice.bed_select == 'bed_generic_option'
+                    --bed $f.formatChoice.bedChoice.BED_generic
+                    #silent $prepare_json($f.formatChoice.bedChoice.BED_generic, extra_data_dict)
                 #silent extra_data_dict.update({"color" : $track_color})
-                #if $f.formatChoice.bedChoice.bed_select == 'bed_simple_repeats_option'
+                #elif $f.formatChoice.bedChoice.bed_select == 'bed_simple_repeats_option'
                     --bedSimpleRepeats $f.formatChoice.bedChoice.BED_simple_repeats
                     #silent $prepare_json($f.formatChoice.bedChoice.BED_simple_repeats, extra_data_dict)
                 #elif $f.formatChoice.bedChoice.bed_select == 'bed_splice_junctions_option'
@@ -58,7 +61,10 @@
             #if $f.formatChoice.format_select == 'gff3'
                 #set track_color = str($f.formatChoice.track_color)
                 #silent extra_data_dict.update({"color" : $track_color})
-                #if $f.formatChoice.gff3Choice.gff3_select == 'gff3_transcript'
+                #if $f.formatChoice.gff3Choice.gff3_select == 'gff3_generic'
+                    --gff3 $f.formatChoice.gff3Choice.GFF3_generic
+                    #silent $prepare_json($f.formatChoice.gff3Choice.GFF3_generic, extra_data_dict)
+                #esif $f.formatChoice.gff3Choice.gff3_select == 'gff3_transcript'
                     --gff3_transcript $f.formatChoice.gff3Choice.GFF3_transcript
                     #silent $prepare_json($f.formatChoice.gff3Choice.GFF3_transcript, extra_data_dict)
                 #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_mrna'
@@ -121,9 +127,18 @@
                     <when value="bed">
                         <conditional name="bedChoice">
                             <param name="bed_select" type="select" label="Bed Choice">
+                                <option value="bed_generic_option">BED format</option>
                                 <option value="bed_simple_repeats_option">BED Simple repeat (bed4+12 / simpleRepeat.as)</option>
                                 <option value="bed_splice_junctions_option">BED Splice junctions (bed12+1 / spliceJunctions.as)</option>
                             </param>
+                            <when value="bed_generic_option">
+                                <param
+                                        format="bed"
+                                        name="BED_generic"
+                                        type="data"
+                                        label="Bed File"
+                                />
+                            </when>
                             <when value="bed_simple_repeats_option">
                                 <param
                                         format="bed"
@@ -185,15 +200,24 @@
                     <when value="gff3">
                         <conditional name="gff3Choice">
                             <param name="gff3_select" type="select" label="gff3 type">
-                                <option value="gff3_transcript">GFF3 format, structure: gene->transcription->CDS</option>
-                                <option value="gff3_mrna">GFF3 format, structure: gene->mRNA->CDS</option>
+                                <option value="gff3_generic">GFF3 format</option>
+                                <option value="gff3_transcript">GFF3 format output from gene prediction tools (e.g. Augustus), structure: gene->transcription->CDS</option>
+                                <option value="gff3_mrna">GFF3 format output from gene prediction tools (e.g. SNAP), structure: gene->mRNA->CDS</option>
                             </param>
+                            <when value="gff3_generic">
+                                <param
+                                        format="gff3"
+                                        name="GFF3_generic"
+                                        type="data"
+                                        label="GFF3 File"
+                                />
+                            </when>
                             <when value="gff3_transcript">
                                 <param
                                         format="gff3"
                                         name="GFF3_transcript"
                                         type="data"
-                                        label="GFF3 File"
+                                        label="GFF3 File from gene prediction"
                                 />
                             </when>
                             <when value="gff3_mrna">
@@ -201,7 +225,7 @@
                                         format="gff3"
                                         name="GFF3_mrna"
                                         type="data"
-                                        label="GFF3 File"
+                                        label="GFF3 File from gene prediction"
                                 />
                             </when>
                         </conditional>

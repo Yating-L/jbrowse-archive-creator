@@ -33,10 +33,12 @@ class trackObject:
         fileName = os.path.basename(dataFile)
         des_path = os.path.join(self.raw_folder, fileName)
         track = {}
-        if dataType == 'gff3_mrna' or dataType == 'gff3_transcript' or dataType == 'fasta' or dataType == 'bam' or dataType == 'bigwig' or dataType == 'bai':
+        if dataType == 'bed' or dataType == 'gff3' or dataType == 'gff3_mrna' or dataType == 'gff3_transcript' or dataType == 'fasta' or dataType == 'bam' or dataType == 'bigwig':
             if dataType == 'bam':
                 # JBrowse will raise error: not a BAM file if the filename hasn't .bam extension
-                fileName = fileName + '.bam'
+                extension = os.path.splitext(fileName)[1]
+                if extension != '.bam':
+                    fileName = fileName + '.bam'
                 des_path = os.path.join(self.raw_folder, fileName)
                 bam_index = utils.createBamIndex(dataFile)
                 indexname = os.path.basename(bam_index)
