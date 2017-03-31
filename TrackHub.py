@@ -32,8 +32,8 @@ class TrackHub:
         for input_file in self.input_files:
             self.addTrack(input_file)
         self.indexName()
-        self.makeArchive()
-        self.outHtml()
+        slink = self.makeArchive()
+        self.outHtml(slink)
         print "Success!\n"
     
     def prepareRefseq(self):
@@ -72,7 +72,22 @@ class TrackHub:
 
     def makeArchive(self):
         shutil.make_archive(self.out_path, 'zip', self.out_path)
-        data_folder = '/var/www/html/JBrowse-1.12.1/jbrowse_hub'
+        file_dir = os.path.abspath(self.outfile)
+        source_dir = os.path.dirname(file_dir)
+        folder_name = os.path.basename(self.outfolder)
+        source_name = os.path.basename(self.out_path)
+        source = os.path.join(source_dir, folder_name, source_name)
+        slink = source.replace('/', '_')
+        slink = os.path.join('/var/www/html/JBrowse-1.12.1/data', slink)
+        try:
+            if os.path.islink(slink):
+                os.unlink(slink)
+        except OSError as oserror:
+            print "Cannot create symlink to the data({0}): {1}".format(oserror.errno, oserror.strerror)
+        os.symlink(source, slink)
+        return slink
+        '''
+        data_folder = '/gonramp/static/JBrowse-1.12.1/jbrowse_hub'
         try:
             if os.path.exists(data_folder):
                 if os.path.isdir(data_folder):
@@ -84,14 +99,15 @@ class TrackHub:
         shutil.copytree(self.out_path, data_folder)
         subprocess.call(['chmod', '-R', 'o+rx', '/var/www/html/JBrowse-1.12.1/jbrowse_hub'])
         shutil.rmtree(self.out_path)
+        '''
     
     #TODO: this will list all zip files in the filedir and sub-dirs. worked in Galaxy but all list zip files in test-data when
     #run it locally. May need modify
-    def outHtml(self):
+    def outHtml(self, slink):
         with open(self.outfile, 'w') as htmlfile:
             htmlstr = 'The JBrowse Hub is created: <br>'
             zipfiles = '<li><a href = "%s">Download</a></li>'
-            jbrowse_hub = '<li><a href = ":80/JBrowse-1.12.1/index.html?data=jbrowse_hub/json" target="_blank">View JBrowse Hub</a></li>'
+            jbrowse_hub = '<li><a href = "http://192.168.56.11/JBrowse-1.12.1/index.html?data=%s" target="_blank">View JBrowse Hub</a></li>'
             filedir_abs = os.path.abspath(self.outfile)
             filedir = os.path.dirname(filedir_abs)
             filedir = os.path.join(filedir, self.outfolder)
@@ -101,7 +117,9 @@ class TrackHub:
                         relative_directory = os.path.relpath(root, filedir)
                         relative_file_path = os.path.join(relative_directory, file)
                         htmlstr += zipfiles % relative_file_path
-            htmlstr += jbrowse_hub
+            link_name = os.path.basename(slink)
+            relative_path = os.path.join('data', link_name + '/json')
+            htmlstr += jbrowse_hub % relative_path
             htmlfile.write(htmlstr)
 
     def createTrackList(self):
