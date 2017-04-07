@@ -60,6 +60,9 @@ def main(argv):
     # Metadata json format
     parser.add_argument('-j', '--data_json', help='Json containing the metadata of the inputs')
 
+    #JBrowse host
+    parser.add_argument('--jbrowse_host', help="JBrowse Host")
+
     args = parser.parse_args()
     all_datatype_dictionary = dict()
     
@@ -72,6 +75,7 @@ def main(argv):
     out_path = 'unknown.html'
     extra_files_path = '.'
     tool_directory = '.'
+    jbrowse_host = args.jbrowse_host
     if args.genome_name:
         genome = args.genome_name
     if args.out:
@@ -148,7 +152,7 @@ def main(argv):
                 #Convert tracks into gff3 format
                 all_tracks.addToRaw(f, datatype)
 
-    jbrowseHub = TrackHub.TrackHub(all_tracks, reference, out_path, tool_directory, genome, extra_files_path, inputs_data)
+    jbrowseHub = TrackHub.TrackHub(all_tracks, reference, out_path, tool_directory, genome, extra_files_path, inputs_data, jbrowse_host)
     jbrowseHub.createHub()
 
 """        

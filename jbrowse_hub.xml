@@ -19,6 +19,10 @@
         --fasta '$reference' 
         --genome_name '$genome_name'
 
+        #set galaxy_url = str($GALAXY_URL)
+        #set $jbrowse_url = galaxy_url.replace("8080", "80")
+        --jbrowse_host '$jbrowse_url'
+        
         ## json metadata recording from Remi's hub-archive-creator.xml
         #import json
         #set global data_parameter_dict = {}
@@ -42,10 +46,10 @@
             #set extra_data_dict = {"label" : $track_label, "category" : $group_name} 
             #if $f.formatChoice.format_select == 'bed'
                 #set track_color = str($f.formatChoice.track_color)
+                #silent extra_data_dict.update({"color" : $track_color})
                 #if $f.formatChoice.bedChoice.bed_select == 'bed_generic_option'
                     --bed $f.formatChoice.bedChoice.BED_generic
                     #silent $prepare_json($f.formatChoice.bedChoice.BED_generic, extra_data_dict)
-                #silent extra_data_dict.update({"color" : $track_color})
                 #elif $f.formatChoice.bedChoice.bed_select == 'bed_simple_repeats_option'
                     --bedSimpleRepeats $f.formatChoice.bedChoice.BED_simple_repeats
                     #silent $prepare_json($f.formatChoice.bedChoice.BED_simple_repeats, extra_data_dict)
@@ -100,6 +104,7 @@
     ]]></command>
 
     <inputs>
+        <param name="GALAXY_URL" type="baseurl" value="" />
         <param name="reference" type="data" format="fasta" label="Reference Genome" />
         <param name="genome_name" type="text" size="30" value="unknown" label="Genome name" />
         <repeat name="group" title="New group">

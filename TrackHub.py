@@ -8,7 +8,7 @@ import utils
 
 
 class TrackHub:
-    def __init__(self, inputFiles, reference, outputDirect, tool_dir, genome, extra_files_path, metaData):
+    def __init__(self, inputFiles, reference, outputDirect, tool_dir, genome, extra_files_path, metaData, jbrowse_host):
         self.input_files = inputFiles.tracks
         self.outfile = outputDirect
         self.outfolder = extra_files_path
@@ -18,6 +18,7 @@ class TrackHub:
         self.metaData = metaData
         self.raw = os.path.join(self.out_path, 'raw')
         self.json = os.path.join(self.out_path, 'json')
+        self.jbrowse_host = jbrowse_host
         try: 
             if os.path.exists(self.json):
                 shutil.rmtree(self.json)
@@ -107,7 +108,8 @@ class TrackHub:
         with open(self.outfile, 'w') as htmlfile:
             htmlstr = 'The JBrowse Hub is created: <br>'
             zipfiles = '<li><a href = "%s">Download</a></li>'
-            jbrowse_hub = '<li><a href = "http://192.168.56.11/JBrowse-1.12.1/index.html?data=%s" target="_blank">View JBrowse Hub</a></li>'
+            url = self.jbrowse_host + "/JBrowse-1.12.1/index.html?data=%s"
+            jbrowse_hub = '<li><a href = "%s" target="_blank">View JBrowse Hub</a></li>' % url
             filedir_abs = os.path.abspath(self.outfile)
             filedir = os.path.dirname(filedir_abs)
             filedir = os.path.join(filedir, self.outfolder)
