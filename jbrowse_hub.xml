@@ -68,7 +68,7 @@
                 #if $f.formatChoice.gff3Choice.gff3_select == 'gff3_generic'
                     --gff3 $f.formatChoice.gff3Choice.GFF3_generic
                     #silent $prepare_json($f.formatChoice.gff3Choice.GFF3_generic, extra_data_dict)
-                #esif $f.formatChoice.gff3Choice.gff3_select == 'gff3_transcript'
+                #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_transcript'
                     --gff3_transcript $f.formatChoice.gff3Choice.GFF3_transcript
                     #silent $prepare_json($f.formatChoice.gff3Choice.GFF3_transcript, extra_data_dict)
                 #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_mrna'

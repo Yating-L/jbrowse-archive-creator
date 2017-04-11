@@ -75,7 +75,9 @@ def main(argv):
     out_path = 'unknown.html'
     extra_files_path = '.'
     tool_directory = '.'
-    jbrowse_host = args.jbrowse_host
+    jbrowse_host = ''
+    if args.jbrowse_host:
+        jbrowse_host = args.jbrowse_host
     if args.genome_name:
         genome = args.genome_name
     if args.out:
