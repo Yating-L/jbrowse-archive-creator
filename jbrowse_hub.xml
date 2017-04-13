@@ -1,4 +1,4 @@
-<tool id="jbrowse_hub" name="JBrowse Hub Creator" version="1.0">
+<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="1.0">
     <description>
         This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse
     </description>
