@@ -87,20 +87,6 @@ class TrackHub:
             print "Cannot create symlink to the data({0}): {1}".format(oserror.errno, oserror.strerror)
         os.symlink(source, slink)
         return slink
-        '''
-        data_folder = '/gonramp/static/JBrowse-1.12.1/jbrowse_hub'
-        try:
-            if os.path.exists(data_folder):
-                if os.path.isdir(data_folder):
-                    shutil.rmtree(data_folder)
-                else:
-                    os.remove(data_folder)
-        except OSError as oserror:
-            print "Cannot create data folder({0}): {1}".format(oserror.errno, oserror.strerror)
-        shutil.copytree(self.out_path, data_folder)
-        subprocess.call(['chmod', '-R', 'o+rx', '/var/www/html/JBrowse-1.12.1/jbrowse_hub'])
-        shutil.rmtree(self.out_path)
-        '''
     
     #TODO: this will list all zip files in the filedir and sub-dirs. worked in Galaxy but all list zip files in test-data when
     #run it locally. May need modify

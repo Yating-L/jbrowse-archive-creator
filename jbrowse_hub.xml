@@ -270,18 +270,12 @@
     <tests>
         <test>
             <param name="reference" value="dbia3/raw/dbia3.fa" />
-            <param name="output" value="hubtest" />
-            <repeat name="group">
-                <param name="group_name" value="Default group"/>
-                <repeat name="format">
-                    <conditional name="formatChoice">
-                        <param name="format_select" value="gff3_transcript"/>
-                        <param name="GFF3_transcript" value="dbia3/raw/Augustus_on_data_3__GTF_GFF.gff3" />
-                    </conditional>
-                </repeat>
-            </repeat>
-            <output name="output" file="hubtest" >
-            </output>
+            <param name="genome_name" value="unknown" />
+            <param name="group_name" value="Default group"/>
+            <param name="format_select" value="bam" />
+            <param name="BAM" value="dbia3/raw/HISAT.bam" />
+            <param name="label" value="" />             
+            <output name="output" file="JBrowse_Archive_Creator_html.html" />
         </test>
     </tests>
     <help>
