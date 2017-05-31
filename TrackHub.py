@@ -3,6 +3,7 @@
 import os
 import subprocess
 import shutil
+import zipfile
 import json
 import utils
 
@@ -72,7 +73,6 @@ class TrackHub:
         print "finished name index \n"
 
     def makeArchive(self):
-        shutil.make_archive(self.out_path, 'zip', self.out_path)
         file_dir = os.path.abspath(self.outfile)
         source_dir = os.path.dirname(file_dir)
         folder_name = os.path.basename(self.outfolder)
@@ -88,23 +88,11 @@ class TrackHub:
         os.symlink(source, slink)
         return slink
     
-    #TODO: this will list all zip files in the filedir and sub-dirs. worked in Galaxy but all list zip files in test-data when
-    #run it locally. May need modify
     def outHtml(self, slink):
         with open(self.outfile, 'w') as htmlfile:
             htmlstr = 'The JBrowse Hub is created: <br>'
-            zipfiles = '<li><a href = "%s">Download</a></li>'
             url = self.jbrowse_host + "/JBrowse-1.12.1/index.html?data=%s"
             jbrowse_hub = '<li><a href = "%s" target="_blank">View JBrowse Hub</a></li>' % url
-            filedir_abs = os.path.abspath(self.outfile)
-            filedir = os.path.dirname(filedir_abs)
-            filedir = os.path.join(filedir, self.outfolder)
-            for root, dirs, files in os.walk(filedir):
-                for file in files:
-                    if file.endswith('.zip'):   
-                        relative_directory = os.path.relpath(root, filedir)
-                        relative_file_path = os.path.join(relative_directory, file)
-                        htmlstr += zipfiles % relative_file_path
             link_name = os.path.basename(slink)
             relative_path = os.path.join('data', link_name + '/json')
             htmlstr += jbrowse_hub % relative_path
