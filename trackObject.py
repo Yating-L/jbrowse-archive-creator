@@ -10,7 +10,7 @@ import blastxmlToGff3
 class trackObject:
     def __init__(self, chrom_size, genome, extra_files_path):
         self.chrom_size = chrom_size
-        outputDirect = os.path.join(extra_files_path, genome)
+        outputDirect = os.path.join(extra_files_path, 'myHub')
         self.raw_folder = os.path.join(outputDirect, 'raw')
         #Store metadata of the tracks
         self.tracks = []

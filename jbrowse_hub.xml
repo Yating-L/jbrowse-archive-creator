@@ -265,7 +265,7 @@
     </inputs>
 
     <outputs>
-        <data format="html" name="output" label="${tool.name}" />
+        <data format="jbrowsehub" name="output" label="${tool.name}" />
     </outputs>
     <tests>
         <test>

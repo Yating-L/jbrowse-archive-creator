@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<datatypes>
+  <registration converters_path="lib/galaxy/datatypes/converters" display_path="display_applications">
+    <datatype extension="jbrowsehub" type="galaxy.datatypes.tracks:UCSCTrackHub" display_in_upload="true">
+        <display file="jbrowse/jbrowsehub.xml" />
+    </datatype>
+  </registration>
+</datatypes>

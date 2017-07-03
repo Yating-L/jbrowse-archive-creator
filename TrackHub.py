@@ -13,7 +13,7 @@ class TrackHub:
         self.input_files = inputFiles.tracks
         self.outfile = outputDirect
         self.outfolder = extra_files_path
-        self.out_path = os.path.join(extra_files_path, genome)
+        self.out_path = os.path.join(extra_files_path, 'myHub')
         self.reference = reference
         self.tool_dir = tool_dir
         self.metaData = metaData
