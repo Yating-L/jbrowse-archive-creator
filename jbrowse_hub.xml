@@ -1,4 +1,4 @@
-<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="1.0">
+<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="1.0.0">
     <description>
         This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse
     </description>
@@ -80,6 +80,10 @@
                 --blastxml $f.formatChoice.BlastXML
                 #silent $prepare_json($f.formatChoice.BlastXML, extra_data_dict)
             #end if
+            #if $f.formatChoice.format_select == 'bigpsl'
+                --bigpsl $f.formatChoice.BigPsl
+                #silent $prepare_json($f.formatChoice.BigPsl, extra_data_dict)
+            #end if
             #if $f.formatChoice.format_select == 'gtf'
                 --gtf $f.formatChoice.GTF
                 #set track_color = str($f.formatChoice.track_color)
@@ -114,8 +118,9 @@
                     <param name="format_select" type="select" label="Format">
                         <option value="bam" selected="true">BAM</option>
                         <option value="bed">BED</option>
-                        <option value="blastxml">BLASTXML</option>
-                        <option value="bigwig">BIGWIG</option>
+                        <option value="blastxml">BlastXML</option>
+                        <option value="bigpsl">BigPsl</option>
+                        <option value="bigwig">BigWig</option>
                         <option value="gff3">GFF3</option>
                         <option value="gtf">GTF</option>
                     </param>
@@ -178,6 +183,15 @@
                                 label="Blast Alignments File"
                         />
                         <param name="label" type="text" size="30" value="Blast Alignment" label="Track name" />
+                    </when>
+                    <when value="bigpsl">
+                        <param
+                                format="bigpsl"
+                                name="BigPsl"
+                                type="data"
+                                label="Blat Alignments File"
+                        />
+                        <param name="label" type="text" size="30" value="Blat Alignment" label="Track name" />
                     </when>
                     <when value="bigwig">
                         <param

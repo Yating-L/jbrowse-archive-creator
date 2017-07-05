@@ -57,18 +57,19 @@ def sequence_region(chrom_sizes):
         sizes_dict[chrom_info[0]] = chrom_info[1]
     return sizes_dict
 
-def child_blocks(parent_field, parent_attr, gff3):
+def child_blocks(parent_field, parent_attr, gff3, child_type):
     num = 0
     blockcount = int(parent_attr['blockcount'])
     chromstart = parent_attr['chromstarts'].split(',')
     blocksize = parent_attr['blocksizes'].split(',')
+    parent_start = parent_field['start']
     while num < blockcount:
         child_attr = OrderedDict()
         child_field = parent_field
-        child_field['type'] = 'exon_junction'
-        child_field['start'] = int(chromstart[num]) + int(parent_field['start'])
+        child_field['type'] = child_type
+        child_field['start'] = int(chromstart[num]) + int(parent_start)
         child_field['end'] = int(child_field['start']) + int(blocksize[num]) - 1
-        child_attr['ID'] = parent_attr['ID'] + '_exon_' + str(num+1)
+        child_attr['ID'] = parent_attr['ID'] + '_part_' + str(num+1)
         child_attr['Parent'] = parent_attr['ID']
         write_features(child_field, child_attr, gff3)
         num = num + 1

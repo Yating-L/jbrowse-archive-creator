@@ -48,6 +48,9 @@ def main(argv):
     # tblastn alignment (blastxml)
     parser.add_argument('--blastxml', action='append', help='blastxml format from tblastn')
 
+    # blat alignment (bigpsl 12+12)
+    parser.add_argument('--bigpsl', action='append', help='bigpsl format from blat alignment')
+
     # BAM format
     parser.add_argument('--bam', action='append', help='BAM format from HISAT')
 
@@ -114,6 +117,7 @@ def main(argv):
     array_inputs_gff3_mrna = args.gff3_mrna
     array_inputs_gtf = args.gtf
     array_inputs_blastxml = args.blastxml
+    array_inputs_bigpsl = args.bigpsl
 
     if array_inputs_bam:
         all_datatype_dictionary['bam'] = array_inputs_bam
@@ -135,7 +139,8 @@ def main(argv):
         all_datatype_dictionary['gtf'] = array_inputs_gtf
     if array_inputs_blastxml:
         all_datatype_dictionary['blastxml'] = array_inputs_blastxml
-    
+    if array_inputs_bigpsl:
+        all_datatype_dictionary['bigpsl'] =  array_inputs_bigpsl    
     print "input tracks: \n", all_datatype_dictionary
 
     for datatype, inputfiles in all_datatype_dictionary.items():

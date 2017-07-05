@@ -56,6 +56,8 @@ class trackObject:
             bedToGff3.bedToGff3(dataFile, self.chrom_size, 'trfbig', des_path)
         elif dataType == 'bedSpliceJunctions':
             bedToGff3.bedToGff3(dataFile, self.chrom_size, 'regtools', des_path)
+        elif dataType == 'bigpsl':
+            bedToGff3.bedToGff3(dataFile, self.chrom_size, 'blat', des_path)
         elif dataType == 'blastxml':
             blastxmlToGff3.blastxml2gff3(dataFile, des_path)
         elif dataType == 'gtf':

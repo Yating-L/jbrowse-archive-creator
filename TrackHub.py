@@ -153,6 +153,8 @@ class TrackHub:
             metadata['category'] = "Default group"
         if track['dataType'] == 'blastxml':
             metadata['type'] = "G-OnRamp_plugin/BlastAlignment"
+        elif track['dataType'] == 'bigpsl':
+            metadata['type'] = "G-OnRamp_plugin/BlatAlignment"
         elif track['dataType'] == 'gff3_transcript' or track['dataType'] == 'gff3_mrna':
             metadata['type'] = "G-OnRamp_plugin/GenePred"
         else:
