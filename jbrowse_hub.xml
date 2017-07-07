@@ -1,4 +1,4 @@
-<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="1.0.0">
+<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="1.0.1">
     <description>
         This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse
     </description>
@@ -56,6 +56,9 @@
                 #elif $f.formatChoice.bedChoice.bed_select == 'bed_splice_junctions_option'
                     --bedSpliceJunctions $f.formatChoice.bedChoice.BED_splice_junctions
                     #silent $prepare_json($f.formatChoice.bedChoice.BED_splice_junctions, extra_data_dict)
+                #elif $f.formatChoice.bedChoice.bed_select == 'bigpsl'
+                    --bigpsl $f.formatChoice.bedChoice.BigPsl
+                    #silent $prepare_json($f.formatChoice.bedChoice.BigPsl, extra_data_dict)
                 #end if
             #end if
             #if $f.formatChoice.format_select == 'bam'
@@ -79,10 +82,6 @@
             #if $f.formatChoice.format_select == 'blastxml'
                 --blastxml $f.formatChoice.BlastXML
                 #silent $prepare_json($f.formatChoice.BlastXML, extra_data_dict)
-            #end if
-            #if $f.formatChoice.format_select == 'bigpsl'
-                --bigpsl $f.formatChoice.BigPsl
-                #silent $prepare_json($f.formatChoice.BigPsl, extra_data_dict)
             #end if
             #if $f.formatChoice.format_select == 'gtf'
                 --gtf $f.formatChoice.GTF
@@ -119,7 +118,6 @@
                         <option value="bam" selected="true">BAM</option>
                         <option value="bed">BED</option>
                         <option value="blastxml">BlastXML</option>
-                        <option value="bigpsl">BigPsl</option>
                         <option value="bigwig">BigWig</option>
                         <option value="gff3">GFF3</option>
                         <option value="gtf">GTF</option>
@@ -140,6 +138,7 @@
                                 <option value="bed_generic_option">BED format</option>
                                 <option value="bed_simple_repeats_option">BED Simple repeat (bed4+12 / simpleRepeat.as)</option>
                                 <option value="bed_splice_junctions_option">BED Splice junctions (bed12+1 / spliceJunctions.as)</option>
+                                <option value="bigpsl">Blat Alignment (bed12+12 / bigPsl.as)</option>
                             </param>
                             <when value="bed_generic_option">
                                 <param
@@ -165,6 +164,14 @@
                                         label="Bed Splice Junctions (Bed12+1) File"
                                 />
                             </when>
+                            <when value="bigpsl">
+                                <param
+                                    format="bed"
+                                    name="BigPsl"
+                                    type="data"
+                                    label="Blat Alignments File"
+                                />
+                            </when>
                         </conditional>
                         <param name="label" type="text" size="30" value="BED file" label="Track name" />
                         <param name="track_color" type="color" label="Track color" value="#daa520">
@@ -183,15 +190,13 @@
                                 label="Blast Alignments File"
                         />
                         <param name="label" type="text" size="30" value="Blast Alignment" label="Track name" />
-                    </when>
-                    <when value="bigpsl">
-                        <param
-                                format="bigpsl"
-                                name="BigPsl"
-                                type="data"
-                                label="Blat Alignments File"
-                        />
-                        <param name="label" type="text" size="30" value="Blat Alignment" label="Track name" />
+                        <param name="track_color" type="color" label="Track color" value="#daa520">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
                     </when>
                     <when value="bigwig">
                         <param
