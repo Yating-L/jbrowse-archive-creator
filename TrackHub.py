@@ -5,13 +5,191 @@ import subprocess
 import shutil
 import zipfile
 import json
-import utils
+import tempfile
+
+from datatypes.Datatype import Datatype
+from util import subtools
 
 
 class TrackHub:
-    def __init__(self, inputFiles, reference, outputDirect, tool_dir, genome, extra_files_path, metaData, jbrowse_host):
-        self.input_files = inputFiles.tracks
-        self.outfile = outputDirect
+    def __init__(self, inputFastaFile, user_email, outputFile, extra_files_path, tool_directory):
+        
+        self.rootAssemblyHub = None
+
+        self.mySpecieFolderPath = None
+        # Store intermediate files, will be removed if not in debug mode
+        self.myTracksFolderPath = None
+        # Store binary files: Bam, BigWig
+        self.myBinaryFolderPath = None
+        self.tool_directory = tool_directory
+
+        self.reference_genome = inputFastaFile
+        # TODO: Add the specie name
+        self.genome_name = inputFastaFile.assembly_id
+        self.specie_html = self.genome_name + '.html'
+        self.default_pos = None
+        self.user_email = user_email
+        self.extra_files_path = extra_files_path
+        self.outputFile = outputFile
+
+        # Create the structure of the Assembly Hub
+        # TODO: Merge the following processing into a function as it is also used in twoBitCreator
+        self.twoBitName = None
+        self.two_bit_final_path = None
+        self.chromSizesFile = None
+
+        # Set all the missing variables of this class, and create physically the folders/files
+        self.rootAssemblyHub = self.__createAssemblyHub__(extra_files_path=extra_files_path)
+        # Init the Datatype
+        Datatype.pre_init(self.reference_genome, self.two_bit_final_path, self.chromSizesFile,
+                          self.extra_files_path, self.tool_directory,
+                          self.mySpecieFolderPath, self.myTracksFolderPath, self.myBinaryFolderPath) 
+
+        self.prepareRefseq()
+        self.trackList = os.path.join(self.mySpecieFolderPath, "trackList.json")
+        self.createTrackList()
+        self.jbrowse_host = '192.168.56.18'
+        
+
+    
+    def addTrack(self, trackDbObject):
+        if trackDbObject['dataType'].lower() == 'bam':
+            #new_track = subprocess.Popen(['echo', trackDbObject['options']], stdout=subprocess.PIPE)
+            #subprocess.call(['add-track-json.pl', json_file], stdin=new_track.stdout)
+            subtools.add_track_json(self.trackList, trackDbObject['options'])
+            #subtools.add_track_json(self.trackList, trackDbObject['track_json'])
+        elif trackDbObject['dataType'].lower() == 'bigwig':
+            subtools.add_track_json(self.trackList, trackDbObject['options'])
+        else: 
+            subtools.flatfile_to_json(trackDbObject['trackDataURL'], trackDbObject['dataType'], trackDbObject['trackType'], trackDbObject['trackLabel'], self.mySpecieFolderPath, trackDbObject['options'])
+            '''
+            if track['dataType'] == 'bed':
+                subprocess.call(['flatfile-to-json.pl', '--bed', flat_file, '--trackType', track['type'], '--trackLabel', track['label'], '--Config', '{"category" : "%s"}' % track['category'], '--clientConfig', '{"color" : "%s"}' % track['color'], '--out', self.mySpecieFolderPath])
+            elif track['dataType'] == 'bedSpliceJunctions' or track['dataType'] == 'gtf' or track['dataType'] == 'blastxml':
+                subprocess.call(['flatfile-to-json.pl', '--gff', flat_file, '--trackType', track['type'], '--trackLabel', track['label'], '--Config', '{"glyph": "JBrowse/View/FeatureGlyph/Segments", "category" : "%s"}' % track['category'], '--clientConfig', '{"color" : "%s"}' % track['color'], '--out', self.mySpecieFolderPath])
+            elif track['dataType'] == 'gff3_transcript':
+                subprocess.call(['flatfile-to-json.pl', '--gff', flat_file, '--trackType', track['type'], '--trackLabel', track['label'], '--Config', '{"transcriptType": "transcript", "category" : "%s"}' % track['category'], '--clientConfig', '{"color" : "%s"}' % track['color'], '--out', self.mySpecieFolderPath])
+            else:
+                subprocess.call(['flatfile-to-json.pl', '--gff', flat_file, '--trackType', track['type'], '--trackLabel', track['label'], '--Config', '{"category" : "%s"}' % track['category'], '--clientConfig', '{"color" : "%s"}' % track['color'], '--out', self.mySpecieFolderPath])
+            '''
+
+    def terminate(self, debug=False):
+        """ Write html file """
+        self.indexName()
+        if not debug:
+            self.removeRaw()
+        slink = self.makeArchive()
+        self.outHtml(slink)
+        print "Success!\n"
+
+    def removeRaw(self):
+        if os.path.exists(self.myTracksFolderPath):
+            shutil.rmtree(self.myTracksFolderPath)
+
+    def createTrackList(self):
+        if not os.path.exists(self.trackList):
+            os.mknod(self.trackList)   
+
+    def prepareRefseq(self):
+        try:
+            #print os.path.join(self.tool_dir, 'prepare-refseqs.pl') + ", '--fasta', " + self.reference +", '--out', self.json])"
+            subprocess.call(['prepare-refseqs.pl', '--fasta', self.reference_genome.false_path, '--out', self.mySpecieFolderPath])
+        except OSError as e:
+            print "Cannot prepare reference error({0}): {1}".format(e.errno, e.strerror)
+
+    def indexName(self):
+        subprocess.call(['generate-names.pl', '-v', '--out', self.mySpecieFolderPath])
+        print "finished name index \n"
+
+    def makeArchive(self):
+        file_dir = os.path.abspath(self.outputFile)
+        source_dir = os.path.dirname(file_dir)
+        folder_name = os.path.basename(self.extra_files_path)
+        source_name = os.path.basename(self.mySpecieFolderPath)
+        source = os.path.join(source_dir, folder_name, source_name)
+        slink = source.replace('/', '_')
+        slink = os.path.join('/var/www/html/JBrowse-1.12.1/data', slink)
+        try:
+            if os.path.islink(slink):
+                os.unlink(slink)
+        except OSError as oserror:
+            print "Cannot create symlink to the data({0}): {1}".format(oserror.errno, oserror.strerror)
+        os.symlink(source, slink)
+        return slink
+    
+    def outHtml(self, slink):
+        with open(self.outputFile, 'w') as htmlfile:
+            htmlstr = 'The JBrowse Hub is created: <br>'
+            url = self.jbrowse_host + "/JBrowse-1.12.1/index.html?data=%s"
+            jbrowse_hub = '<li><a href = "%s" target="_blank">View JBrowse Hub</a></li>' % url
+            link_name = os.path.basename(slink)
+            relative_path = os.path.join('data', link_name + '/json')
+            htmlstr += jbrowse_hub % relative_path
+            htmlfile.write(htmlstr)                                                      
+
+    def __createAssemblyHub__(self, extra_files_path):
+        # Get all necessaries infos first
+        # 2bit file creation from input fasta
+
+        # baseNameFasta = os.path.basename(fasta_file_name)
+        # suffixTwoBit, extensionTwoBit = os.path.splitext(baseNameFasta)
+        # nameTwoBit = suffixTwoBit + '.2bit'
+        twoBitFile = tempfile.NamedTemporaryFile(bufsize=0)
+        subtools.faToTwoBit(self.reference_genome.false_path, twoBitFile.name)
+
+        # Generate the twoBitInfo
+        twoBitInfoFile = tempfile.NamedTemporaryFile(bufsize=0)
+        subtools.twoBitInfo(twoBitFile.name, twoBitInfoFile.name)
+
+        # Then we get the output to generate the chromSizes
+        self.chromSizesFile = tempfile.NamedTemporaryFile(bufsize=0, suffix=".chrom.sizes")
+        subtools.sortChromSizes(twoBitInfoFile.name, self.chromSizesFile.name) 
+
+        # We can get the biggest scaffold here, with chromSizesFile
+        with open(self.chromSizesFile.name, 'r') as chrom_sizes:
+            # TODO: Check if exists
+            self.default_pos = chrom_sizes.readline().split()[0]
+
+        # TODO: Manage to put every fill Function in a file dedicated for reading reasons
+        # Create the root directory
+        myHubPath = os.path.join(extra_files_path, "myHub")
+        if not os.path.exists(myHubPath):
+            os.makedirs(myHubPath)
+
+        # Create the specie folder
+        # TODO: Generate the name depending on the specie
+        mySpecieFolderPath = os.path.join(myHubPath, self.genome_name)
+        if not os.path.exists(mySpecieFolderPath):
+            os.makedirs(mySpecieFolderPath)
+        self.mySpecieFolderPath = mySpecieFolderPath
+
+        # We create the 2bit file while we just created the specie folder
+        self.twoBitName = self.genome_name + ".2bit"
+        self.two_bit_final_path = os.path.join(self.mySpecieFolderPath, self.twoBitName)
+        shutil.copyfile(twoBitFile.name, self.two_bit_final_path)
+
+      
+
+        # Create the file groups.txt
+        # TODO: If not inputs for this, do no create the file
+        # groupsTxtFilePath = os.path.join(mySpecieFolderPath, 'groups.txt')
+        # self.__fillGroupsTxtFile__(groupsTxtFilePath)
+
+        # Create the folder tracks into the specie folder
+        tracksFolderPath = os.path.join(mySpecieFolderPath, "raw")
+        if not os.path.exists(tracksFolderPath):
+            os.makedirs(tracksFolderPath)
+        self.myTracksFolderPath = tracksFolderPath
+
+        myBinaryFolderPath = os.path.join(mySpecieFolderPath, 'bbi')
+        if not os.path.exists(myBinaryFolderPath):
+            os.makedirs(myBinaryFolderPath)
+        self.myBinaryFolderPath = myBinaryFolderPath
+
+        return myHubPath
+'''
+        #self.input_files = inputFiles.tracks
+        self.outputFile = outputFile
         self.outfolder = extra_files_path
         self.out_path = os.path.join(extra_files_path, 'myHub')
         self.reference = reference
@@ -19,7 +197,7 @@ class TrackHub:
         self.metaData = metaData
         self.raw = os.path.join(self.out_path, 'raw')
         self.json = os.path.join(self.out_path, 'json')
-        self.jbrowse_host = jbrowse_host
+        self.jbrowse_host = "localhost"
         try: 
             if os.path.exists(self.json):
                 shutil.rmtree(self.json)
@@ -160,7 +338,7 @@ class TrackHub:
         else:
             metadata['type'] = "CanvasFeatures"
 
-
+'''
 
    
 

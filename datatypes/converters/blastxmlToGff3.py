@@ -149,11 +149,10 @@ def gff3_writer(blast_records, gff3_file):
                 utils.write_features(align['field'], align['attribute'], gff3)
     gff3.close()
 
-def blastxml2gff3(xml_file, gff3_file):
+def blastxmlToGff3(xml_file, gff3_file):
     result_handle = open(xml_file)
     blast_records = NCBIXML.parse(result_handle)
     gff3_writer(blast_records, gff3_file)
 
 if __name__ == "__main__":
-    blastxml2gff3("../dbia3/raw/tblastn_dmel-hits-translation-r6.11.fa_vs_nucleotide_BLAST_database_from_data_3.blastxml", "gff3.txt")
-
+    blastxmlToGff3("../dbia3/raw/tblastn_dmel-hits-translation-r6.11.fa_vs_nucleotide_BLAST_database_from_data_3.blastxml", "gff3.txt")

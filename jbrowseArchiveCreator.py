@@ -1,17 +1,87 @@
 #!/usr/bin/env python
+# -*- coding: utf8 -*-
+
+"""
+This Galaxy tool permits to prepare your files to be ready for JBrowse visualization.
+"""
 
 import sys
 import argparse
 import json
-import utils
-import trackObject
-import TrackHub
+import logging
+import collections
+
+
+# Internal dependencies
+from util.Reader import Reader
+from util.Logger import Logger 
+from TrackHub import TrackHub
 
 
 
 def main(argv):
     parser = argparse.ArgumentParser(description='Create a hub to display in jbrowse.')
+    parser.add_argument('-j', '--data_json', help='JSON file containing the metadata of the inputs')
+    parser.add_argument('-o', '--output', help='Name of the HTML summarizing the content of the JBrowse Hub Archive')
 
+    # Get the args passed in parameter
+    args = parser.parse_args()
+    json_inputs_data = args.data_json
+    outputFile = args.output
+
+    ##Parse JSON file with Reader
+    reader = Reader(json_inputs_data)
+
+    # Begin init variables
+    extra_files_path = reader.getExtFilesPath()
+    toolDirectory = reader.getToolDir()
+    #outputFile = reader.getOutputDir()
+    user_email = reader.getUserEmail()
+    reference_genome = reader.getRefGenome()
+    debug_mode = reader.getDebugMode()
+
+    #### Logging management ####
+    # If we are in Debug mode, also print in stdout the debug dump
+    log = Logger(tool_directory=toolDirectory, debug=debug_mode, extra_files_path=extra_files_path)
+    log.setup_logging()
+    logging.info('#### JBrowseArchiveCreator: Start ####\n')
+    logging.debug('---- Welcome in JBrowseArchiveCreator Debug Mode ----\n')
+    logging.debug('JSON parameters: %s\n\n', json.dumps(reader.args))
+    #### END Logging management ####
+
+    # Create the Track Hub folder
+    logging.info('#### JBrowseArchiveCreator: Creating the Track Hub folder ####\n')
+    trackHub = TrackHub(reference_genome, user_email, outputFile, extra_files_path, toolDirectory)
+
+    # Create Ordered Dictionary to add the tracks in the tool form order
+    logging.info('#### JBrowseArchiveCreator: Preparing track data ####\n')
+    all_datatype_dictionary = reader.getTracksData()
+    all_datatype_ordered_dictionary = collections.OrderedDict(all_datatype_dictionary)
+
+    logging.debug("----- End of all_datatype_dictionary processing -----")
+    #logging.debug("all_datatype_ordered_dictionary are: %s", json.dumps(all_datatype_ordered_dictionary))
+
+    logging.info('#### JBrowseArchiveCreator: Adding tracks to Track Hub ####\n')
+    logging.debug("----- Beginning of Track adding processing -----")
+
+    for index, datatypeObject in all_datatype_ordered_dictionary.iteritems():
+       trackHub.addTrack(datatypeObject.track.track_db)
+
+    logging.debug("----- End of Track adding processing -----")
+
+    # We terminate the process and so create a HTML file summarizing all the files
+    logging.info('#### JBrowseArchiveCreator: Creating the HTML file ####\n')
+    trackHub.terminate(debug_mode)
+
+    logging.debug('---- End of JBrowseArchiveCreator Debug Mode: Bye! ----\n')
+    logging.info('#### JBrowseArchiveCreator: Congratulation! Assembly Hub is created! ####\n')
+
+    sys.exit(0)
+
+if __name__ == "__main__":
+    main(sys.argv)
+
+'''
     # Reference genome mandatory
     parser.add_argument('-f', '--fasta', help='Fasta file of the reference genome (Required)')
 
@@ -157,7 +227,8 @@ def main(argv):
                    # metadata = inputs_data[f]
                     #print metadata
                 #Convert tracks into gff3 format
-                all_tracks.addToRaw(f, datatype)
+
+                #all_tracks.addToRaw(f, datatype)
 
     jbrowseHub = TrackHub.TrackHub(all_tracks, reference, out_path, tool_directory, genome, extra_files_path, inputs_data, jbrowse_host)
     jbrowseHub.createHub()
@@ -170,7 +241,29 @@ def extractMetadata(array_inputs, inputs_data):
             if key == input_false_path:
                 metadata_dict[input_false_path]
 """
+ def create_ordered_datatype_objects(self, ExtensionClass, array_inputs):
+        """
+        Function which executes the creation all the necessary files / folders for a special Datatype, for TrackHub
+        and update the dictionary of datatype
+
+        :param ExtensionClass:
+        :param array_inputs:
+        :type ExtensionClass: Datatype
+        :type array_inputs: list[string]
+        """
+
+        datatype_dictionary = {}
+
+        # TODO: Optimize this double loop
+        for input_data in array_inputs:
+            input_false_path = input_data["false_path"]
+            input_data["name"] = santitizer.sanitize_name_input(input_data["name"])
+            extensionObject = ExtensionClass(input_false_path, input_data)
+            extensionObject.generateCustomTrack()
+            datatype_dictionary.update({input_data["order_index"]: extensionObject})
+        return datatype_dictionary
 
 if __name__ == "__main__":
     main(sys.argv)
+'''
 

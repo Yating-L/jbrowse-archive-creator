@@ -81,6 +81,8 @@
             #end if
             #if $f.formatChoice.format_select == 'blastxml'
                 --blastxml $f.formatChoice.BlastXML
+                #set track_color = str($f.formatChoice.track_color)
+                #silent extra_data_dict.update({"color" : $track_color})
                 #silent $prepare_json($f.formatChoice.BlastXML, extra_data_dict)
             #end if
             #if $f.formatChoice.format_select == 'gtf'
