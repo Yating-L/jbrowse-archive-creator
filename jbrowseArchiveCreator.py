@@ -51,7 +51,7 @@ def main(argv):
 
     # Create the Track Hub folder
     logging.info('#### JBrowseArchiveCreator: Creating the Track Hub folder ####\n')
-    trackHub = TrackHub(reference_genome, user_email, outputFile, extra_files_path, toolDirectory)
+    trackHub = TrackHub(reference_genome, user_email, outputFile, extra_files_path, toolDirectory, jbrowse_path="/home/gonramp/Apollo-2.0.7/web-app/jbrowse/", apollo_host="http://localhost:8080/apollo")
 
     # Create Ordered Dictionary to add the tracks in the tool form order
     logging.info('#### JBrowseArchiveCreator: Preparing track data ####\n')

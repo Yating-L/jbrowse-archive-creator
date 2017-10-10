@@ -6,13 +6,16 @@ import shutil
 import zipfile
 import json
 import tempfile
+import logging
+from mako.lookup import TemplateLookup
+
 
 from datatypes.Datatype import Datatype
 from util import subtools
 
 
 class TrackHub:
-    def __init__(self, inputFastaFile, user_email, outputFile, extra_files_path, tool_directory):
+    def __init__(self, inputFastaFile, user_email, outputFile, extra_files_path, tool_directory, jbrowse_path=None, apollo_host=None):
         
         self.rootAssemblyHub = None
 
@@ -32,6 +35,11 @@ class TrackHub:
         self.extra_files_path = extra_files_path
         self.outputFile = outputFile
 
+        # Template groups
+        mylookup = TemplateLookup(directories=[os.path.join(self.tool_directory, 'templates')],
+                                  output_encoding='utf-8', encoding_errors='replace')
+        self.cssTemplate = mylookup.get_template("custom_track_styles.css")
+
         # Create the structure of the Assembly Hub
         # TODO: Merge the following processing into a function as it is also used in twoBitCreator
         self.twoBitName = None
@@ -48,7 +56,9 @@ class TrackHub:
         self.prepareRefseq()
         self.trackList = os.path.join(self.mySpecieFolderPath, "trackList.json")
         self.createTrackList()
-        self.jbrowse_host = '192.168.56.18'
+        self.jbrowse_path = jbrowse_path
+        self.apollo_host = apollo_host
+        self.logger = logging.getLogger(__name__)
         
 
     
@@ -72,14 +82,56 @@ class TrackHub:
             else:
                 subprocess.call(['flatfile-to-json.pl', '--gff', flat_file, '--trackType', track['type'], '--trackLabel', track['label'], '--Config', '{"category" : "%s"}' % track['category'], '--clientConfig', '{"color" : "%s"}' % track['color'], '--out', self.mySpecieFolderPath])
             '''
+        self.customizeSubfeatures(trackDbObject)
+        
+
+
+    def customizeSubfeatures(self, trackDbObject):
+        if trackDbObject['options']:
+            if 'clientConfig' in trackDbObject['options']:
+                clientConfig = json.loads(trackDbObject['options']['clientConfig'])
+                if clientConfig:
+                    subfeatures = clientConfig.get('subfeatureClasses')
+                    if subfeatures:
+                        #print subfeatures
+                        feature_color = trackDbObject['options']['feature_color']
+                        self.createCssClass(subfeatures, feature_color)
+                        self.addCustimizedCss()
+
+    def createCssClass(self, subfeatures, feature_color):
+        cssFilePath = os.path.join(self.mySpecieFolderPath, 'custom_track_styles.css')
+        if not os.path.exists(cssFilePath):
+            os.mknod(cssFilePath)   
+        #self.logger.debug("addCssClass: cssFilePath= %s", cssFilePath)
+        #subfeatures = trackDbObject.get('subfeatureClasses')
+        for key, value in subfeatures.items():
+            with open(cssFilePath, 'a+') as css:
+                htmlMakoRendered = self.cssTemplate.render(
+                label = value,
+                color = feature_color
+            )
+                css.write(htmlMakoRendered)
+        self.logger.debug("create customized track css class: cssFilePath= %s", cssFilePath)
+
+    @staticmethod
+    def getRgb(track_color):
+        #TODO: Check if rgb or hexa
+        # Convert hexa to rgb array
+        hexa_without_sharp = track_color.lstrip('#')
+        rgb_array = [int(hexa_without_sharp[i:i+2], 16) for i in (0, 2, 4)]
+        rgb_ucsc = ','.join(map(str, rgb_array))
+        rgb_css = "rgb(" + rgb_ucsc + ")"
+        return rgb_css
+
 
     def terminate(self, debug=False):
         """ Write html file """
         self.indexName()
         if not debug:
             self.removeRaw()
-        slink = self.makeArchive()
-        self.outHtml(slink)
+        self.makeArchive()
+        #self.outHtml(slink)
+        #slink = self.linkCustomCss()
         print "Success!\n"
 
     def removeRaw(self):
@@ -101,6 +153,70 @@ class TrackHub:
         subprocess.call(['generate-names.pl', '-v', '--out', self.mySpecieFolderPath])
         print "finished name index \n"
 
+    def addCustimizedCss(self):
+        with open(self.trackList, 'r+') as track:
+            data = json.load(track)
+            css_path = os.path.join('data', 'custom_track_styles.css')
+            data['css'] = {'url': css_path}
+            json_string = json.dumps(data, indent=4, separators=(',', ': '))
+            track.seek(0)
+            track.write(json_string)
+            track.truncate()
+        self.logger.debug("added customized css url to trackList.json")
+        #file_dir = os.path.abspath(self.outputFile)
+        #source_dir = os.path.dirname(file_dir)
+        #folder_name = os.path.basename(self.extra_files_path)
+        #source_name = os.path.basename(self.mySpecieFolderPath)
+        #source = os.path.join(self.mySpecieFolderPath, 'custom_track_styles.css')
+        #source = os.path.join(source_dir, folder_name, source_name, 'custom_track_styles.css')
+        
+        #slink_name = source.replace('/', '_')
+        #jbrowse_css = os.path.join(self.jbrowse_path, 'data')
+        #if not os.path.exists(jbrowse_css):
+        #     os.makedirs(jbrowse_css)
+        #css_relative_path = os.path.join('data', slink_name)
+        #slink = os.path.join(jbrowse_css, slink_name)
+        #try:
+        #    if os.path.islink(slink):
+        #        os.unlink(slink)
+        #except OSError as oserror:
+        #    print "Cannot create symlink to the data({0}): {1}".format(oserror.errno, oserror.strerror)
+        #os.symlink(source, slink)
+        #self.logger.debug("made symbolic link for customized css file")
+        
+        #self._addCssToTrackList()
+        #self.logger.debug("add css url to trackList.json: css slink = %s", slink)
+        #return slink
+    '''
+    def _addCssToTrackList(self):
+        with open(self.trackList, 'r+') as track:
+            data = json.load(track)
+            data['css'] = {'url': 'custom_track_styles.css'}
+            json_string = json.dumps(data, indent=4, separators=(',', ': '))
+            track.seek(0)
+            track.write(json_string)
+            track.truncate()
+        self.logger.debug("added customized css url to trackList.json")
+    '''
+    def addOrganism(self):
+        subtools.arrow_add_organism(self.genome_name, self.mySpecieFolderPath)
+
+
+    def outHtml(self):
+        with open(self.outputFile, 'w') as htmlfile:
+            htmlstr = 'The new Organism "%s" is created on Apollo: <br>' % self.genome_name
+            jbrowse_hub = '<li><a href = "%s" target="_blank">View JBrowse Hub on Apollo</a></li>' % self.apollo_host
+            htmlstr += jbrowse_hub
+            htmlfile.write(htmlstr)     
+
+    def makeArchive(self):
+        #self.addCustimizedCss()
+        self.addOrganism()
+        self.outHtml()
+        
+        
+
+    '''
     def makeArchive(self):
         file_dir = os.path.abspath(self.outputFile)
         source_dir = os.path.dirname(file_dir)
@@ -126,6 +242,7 @@ class TrackHub:
             relative_path = os.path.join('data', link_name + '/json')
             htmlstr += jbrowse_hub % relative_path
             htmlfile.write(htmlstr)                                                      
+    '''
 
     def __createAssemblyHub__(self, extra_files_path):
         # Get all necessaries infos first

@@ -19,6 +19,7 @@ class Gff3_transcript( Gff ):
     def initSettings(self):
         super(Gff3_transcript, self).initSettings()
         self.extraSettings["transcriptType"] = "transcript"
+        self.extraSettings["type"] = "transcript"
     
     def validateData(self):
         self.validator = Gff3Validation(self.inputFile, self.dataType, self.chromSizesFile.name)

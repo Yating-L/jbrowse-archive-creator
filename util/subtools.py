@@ -248,12 +248,16 @@ def flatfile_to_json(inputFile, dataType, trackType, trackLabel, outputFolder, o
     if options:
         config = options.get("Config")
         clientConfig = options.get("clientConfig")
+        load_type = options.get("type")
         if clientConfig:
-            array_call.append('-clientConfig')
+            array_call.append('--clientConfig')
             array_call.append(clientConfig)
         if config:
-            array_call.append('-Config')
+            array_call.append('--config')
             array_call.append(config)
+        if load_type:
+            array_call.append('--type')
+            array_call.append(load_type)
 
     p = _handleExceptionAndCheckCall(array_call)
     return p
@@ -273,7 +277,7 @@ def bam_to_json(inputFile, trackLabel, outputFolder, options=None, compress=Fals
             array_call.append('-clientConfig')
             array_call.append(clientConfig)
         if config:
-            array_call.append('-Config')
+            array_call.append('-config')
             array_call.append(config)
 
     p = _handleExceptionAndCheckCall(array_call)
@@ -306,4 +310,8 @@ def validateFiles(input_file, chrom_sizes_file_name, file_type, options=None):
             array_call.append('-tab')
     p = _handleExceptionAndCheckCall(array_call)
     return p
-    
+
+def arrow_add_organism(genome_name, mySpecieFolderPath):
+    array_call = ['arrow', 'organisms', 'add_organism', '--public', genome_name, mySpecieFolderPath]
+    p = _handleExceptionAndCheckCall(array_call)
+    return p

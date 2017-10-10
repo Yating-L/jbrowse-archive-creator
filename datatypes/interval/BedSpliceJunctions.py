@@ -21,6 +21,7 @@ class BedSpliceJunctions( Bed ):
     def initSettings(self):
         super(BedSpliceJunctions, self).initSettings()
         self.extraSettings["glyph"] = "JBrowse/View/FeatureGlyph/Segments"
+        self.extraSettings["subfeatureClasses"] = "exon_junction"
 
     def validateData(self):
         self.validateOptions = self.getValidateOptions(tab="True", autoSql=self.autoSql)

@@ -21,7 +21,7 @@ class TrackDb(object):
         self.trackType = trackType
         self.dataType = dataType
         self.extraSettings = extraSettings
-            
+        
         self.createTrackDb()
 
     def createTrackDb(self):
@@ -73,7 +73,27 @@ class TrackDb(object):
         '''
     def configHTMLFeatures(self):
         """ set HTMLFeatures configuration options """
-        pass
+        extraConfigs = dict()
+        self.extraSettings["clientConfig"] = dict()
+        self.extraSettings["Config"] = dict()
+        if 'type' in self.extraSettings:
+            extraConfigs["type"] = self.extraSettings['type']
+        if 'color' in self.extraSettings and self.extraSettings['color']:
+            extraConfigs['feature_color'] = self.extraSettings['color']
+        else:
+            extraConfigs['feature_color'] = "#000000"
+        #self.extraSettings['clientConfig']['color'] = self.extraSettings['color']
+        if 'subfeatureClasses' in self.extraSettings:
+            subfeature_css_class = santitizer.sanitize_name(self.extraSettings['subfeatureClasses'])
+            self.extraSettings['clientConfig']['subfeatureClasses'] = {self.extraSettings['subfeatureClasses']: subfeature_css_class}
+        if 'category' not in self.extraSettings or not self.extraSettings['category']:
+            self.extraSettings['Config']['category'] = "Default group"
+        else:
+            self.extraSettings['Config']['category'] = self.extraSettings['category']
+    
+        extraConfigs['Config'] = json.dumps(self.extraSettings["Config"])
+        extraConfigs['clientConfig'] = json.dumps(self.extraSettings["clientConfig"])
+        return extraConfigs
     
     def configBam(self):
         if 'category' not in self.extraSettings or not self.extraSettings['category']:

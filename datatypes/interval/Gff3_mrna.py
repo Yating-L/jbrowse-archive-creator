@@ -16,7 +16,10 @@ class Gff3_mrna( Gff ):
         self.dataType = "gff"
         #self.trackType = "G-OnRamp_plugin/GenePred"
 
-    
+    def initSettings(self):
+        super(Gff3_mrna, self).initSettings()
+        self.extraSettings["type"] = "mRNA"
+
     def validateData(self):
         self.validator = Gff3Validation(self.inputFile, self.dataType, self.chromSizesFile.name)
         self.inputFile = self.validator.validate()
