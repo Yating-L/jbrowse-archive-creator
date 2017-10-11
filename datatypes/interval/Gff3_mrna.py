@@ -19,6 +19,7 @@ class Gff3_mrna( Gff ):
     def initSettings(self):
         super(Gff3_mrna, self).initSettings()
         self.extraSettings["type"] = "mRNA"
+        self.extraSettings["subfeatureClasses"] = "CDS"
 
     def validateData(self):
         self.validator = Gff3Validation(self.inputFile, self.dataType, self.chromSizesFile.name)

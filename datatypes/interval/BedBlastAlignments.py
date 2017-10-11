@@ -16,6 +16,10 @@ class BedBlastAlignments( BigPsl ):
         #self.seqType = 1
         self.trackType = "G-OnRamp_plugin/BlastAlignment"
 
+    def initSettings(self):
+        super(BedBlastAlignments, self).initSettings()
+        self.extraSettings["subfeatureClasses"] = "match_part"
+
     
     
     

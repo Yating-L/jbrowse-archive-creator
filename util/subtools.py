@@ -246,8 +246,10 @@ def flatfile_to_json(inputFile, dataType, trackType, trackLabel, outputFolder, o
     if compress:
         array_call.append('--compress')
     if options:
-        config = options.get("Config")
+        config = options.get("config")
         clientConfig = options.get("clientConfig")
+        renderClassName = options.get('renderClassName')
+        subfeatureClasses = options.get('subfeatureClasses')
         load_type = options.get("type")
         if clientConfig:
             array_call.append('--clientConfig')
@@ -258,6 +260,12 @@ def flatfile_to_json(inputFile, dataType, trackType, trackLabel, outputFolder, o
         if load_type:
             array_call.append('--type')
             array_call.append(load_type)
+        if renderClassName:
+            array_call.append('--renderClassName')
+            array_call.append(renderClassName)
+        if subfeatureClasses:
+            array_call.append('--subfeatureClasses')
+            array_call.append(json.dumps(subfeatureClasses))
 
     p = _handleExceptionAndCheckCall(array_call)
     return p
@@ -271,19 +279,20 @@ def bam_to_json(inputFile, trackLabel, outputFolder, options=None, compress=Fals
     if compress:
         array_call.append('--compress')
     if options:
-        config = options.get("Config")
-        clientConfig = options.get("clientConfig")
+        config = options.get('config')
+        clientConfig = options.get('clientConfig')
         if clientConfig:
-            array_call.append('-clientConfig')
+            array_call.append('--clientConfig')
             array_call.append(clientConfig)
         if config:
-            array_call.append('-config')
+            array_call.append('--config')
             array_call.append(config)
 
     p = _handleExceptionAndCheckCall(array_call)
     return p
 
 def add_track_json(trackList, track_json):
+    track_json = json.dumps(track_json)
     new_track = subprocess.Popen(['echo', track_json], stdout=subprocess.PIPE)
     p = subprocess.call(['add-track-json.pl', trackList], stdin=new_track.stdout)
     return p

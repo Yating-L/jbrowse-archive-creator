@@ -2,10 +2,13 @@
 import os
 import collections
 import json
+import logging
 from util import santitizer
 
 class TrackDb(object):
     """docstring for TrackDb"""
+    
+
     def __init__(self, trackName, trackLabel, trackDataURL, trackType, dataType, extraSettings=None):
         #super(TrackDb, self).__init__()
         not_init_message = "The {0} is not initialized." 
@@ -21,7 +24,7 @@ class TrackDb(object):
         self.trackType = trackType
         self.dataType = dataType
         self.extraSettings = extraSettings
-        
+        self.logger = logging.getLogger(__name__)
         self.createTrackDb()
 
     def createTrackDb(self):
@@ -42,9 +45,10 @@ class TrackDb(object):
         
         
         extraConfigs = self.prepareExtraSetting()
+        self.logger.debug("Generate extraConfigs = %s", json.dumps(extraConfigs))
         self.track_db["options"] = extraConfigs
         #print self.track_db
-
+        self.logger.debug("TrackDb object is created track_db = %s ", json.dumps(self.track_db))
     
     def prepareExtraSetting(self):
         
@@ -75,7 +79,7 @@ class TrackDb(object):
         """ set HTMLFeatures configuration options """
         extraConfigs = dict()
         self.extraSettings["clientConfig"] = dict()
-        self.extraSettings["Config"] = dict()
+        self.extraSettings["config"] = dict()
         if 'type' in self.extraSettings:
             extraConfigs["type"] = self.extraSettings['type']
         if 'color' in self.extraSettings and self.extraSettings['color']:
@@ -84,14 +88,15 @@ class TrackDb(object):
             extraConfigs['feature_color'] = "#000000"
         #self.extraSettings['clientConfig']['color'] = self.extraSettings['color']
         if 'subfeatureClasses' in self.extraSettings:
-            subfeature_css_class = santitizer.sanitize_name(self.extraSettings['subfeatureClasses'])
-            self.extraSettings['clientConfig']['subfeatureClasses'] = {self.extraSettings['subfeatureClasses']: subfeature_css_class}
+            subfeature_css_class = santitizer.sanitize_name(self.trackLabel + "_" + self.extraSettings['subfeatureClasses'])
+            extraConfigs['subfeatureClasses'] = {self.extraSettings['subfeatureClasses']: subfeature_css_class}
+
         if 'category' not in self.extraSettings or not self.extraSettings['category']:
-            self.extraSettings['Config']['category'] = "Default group"
+            self.extraSettings['config']['category'] = "Default group"
         else:
-            self.extraSettings['Config']['category'] = self.extraSettings['category']
+            self.extraSettings['config']['category'] = self.extraSettings['category']
     
-        extraConfigs['Config'] = json.dumps(self.extraSettings["Config"])
+        extraConfigs['config'] = json.dumps(self.extraSettings["config"])
         extraConfigs['clientConfig'] = json.dumps(self.extraSettings["clientConfig"])
         return extraConfigs
     
@@ -105,7 +110,8 @@ class TrackDb(object):
         bam_track['baiUrlTemplate'] = os.path.join('bbi', self.extraSettings['index'])
         bam_track['label'] = self.trackLabel
         bam_track['category'] = self.extraSettings['category']
-        extraConfigs = json.dumps(bam_track)
+        #extraConfigs = json.dumps(bam_track)
+        extraConfigs = bam_track
         return extraConfigs
 
     def configBigWig(self):
@@ -124,27 +130,28 @@ class TrackDb(object):
         bigwig_track['label'] = self.trackLabel
         bigwig_track['style'] = self.extraSettings['style']
         bigwig_track['category'] = self.extraSettings['category']
-        extraConfigs = json.dumps(bigwig_track)
+        #extraConfigs = json.dumps(bigwig_track)
+        extraConfigs = bigwig_track
         return extraConfigs
 
     def configCanvasFeatures(self):
         """ set CanvasFeatures configuration options """
         extraConfigs = dict()
         self.extraSettings["clientConfig"] = dict()
-        self.extraSettings["Config"] = dict()
+        self.extraSettings["config"] = dict()
         if 'color' not in self.extraSettings or not self.extraSettings['color']:
             self.extraSettings["clientConfig"]['color'] = "#daa520"
         else:
             self.extraSettings["clientConfig"]['color'] = self.extraSettings['color']
         if 'category' not in self.extraSettings or not self.extraSettings['category']:
-            self.extraSettings["Config"]['category'] = "Default group"
+            self.extraSettings["config"]['category'] = "Default group"
         else:
-            self.extraSettings["Config"]['category'] = self.extraSettings['category']
+            self.extraSettings["config"]['category'] = self.extraSettings['category']
         if 'glyph' in self.extraSettings:
-            self.extraSettings["Config"]['glyph'] = self.extraSettings['glyph']
+            self.extraSettings["config"]['glyph'] = self.extraSettings['glyph']
         if 'transcriptType' in self.extraSettings:
             self.extraSettings['Config']['transcriptType'] = self.extraSettings['transcriptType']
-        extraConfigs["Config"] = json.dumps(self.extraSettings["Config"])
+        extraConfigs["config"] = json.dumps(self.extraSettings["config"])
         extraConfigs["clientConfig"] = json.dumps(self.extraSettings["clientConfig"])
         return extraConfigs
 

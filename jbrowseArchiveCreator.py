@@ -39,7 +39,10 @@ def main(argv):
     user_email = reader.getUserEmail()
     reference_genome = reader.getRefGenome()
     debug_mode = reader.getDebugMode()
-
+    track_type = reader.getTrackType()
+    #jbrowse_path = reader.getJBrowsePath()
+    apollo_host = reader.getApolloHost()
+ 
     #### Logging management ####
     # If we are in Debug mode, also print in stdout the debug dump
     log = Logger(tool_directory=toolDirectory, debug=debug_mode, extra_files_path=extra_files_path)
@@ -51,7 +54,7 @@ def main(argv):
 
     # Create the Track Hub folder
     logging.info('#### JBrowseArchiveCreator: Creating the Track Hub folder ####\n')
-    trackHub = TrackHub(reference_genome, user_email, outputFile, extra_files_path, toolDirectory, jbrowse_path="/home/gonramp/Apollo-2.0.7/web-app/jbrowse/", apollo_host="http://localhost:8080/apollo")
+    trackHub = TrackHub(reference_genome, user_email, outputFile, extra_files_path, toolDirectory, track_type, apollo_host)
 
     # Create Ordered Dictionary to add the tracks in the tool form order
     logging.info('#### JBrowseArchiveCreator: Preparing track data ####\n')

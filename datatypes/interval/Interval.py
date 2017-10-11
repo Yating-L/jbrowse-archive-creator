@@ -14,7 +14,8 @@ class Interval(Datatype):
     def __init__(self):
         super(Interval, self).__init__()
         #self.trackType = "CanvasFeatures"
-        self.trackType = "HTMLFeatures"
+        if not self.trackType:
+            self.trackType = "HTMLFeatures"
         self.trackFileType = "gff"
 
 

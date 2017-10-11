@@ -17,6 +17,8 @@ class BedSimpleRepeats( Bed ):
         self.autoSql = os.path.join(self.tool_directory, 'trf_simpleRepeat.as')
         self.trackFileType = "gff"
 
+    
+
     def validateData(self):
         self.validateOptions = self.getValidateOptions(tab="True", autoSql=self.autoSql)
         self.validator = DataValidation(self.inputFile, self.getValidateType(), self.chromSizesFile.name, self.validateOptions)

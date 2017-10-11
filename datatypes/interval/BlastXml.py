@@ -21,6 +21,7 @@ class BlastXml( Interval ):
     def initSettings(self):
         super(BlastXml, self).initSettings()
         self.extraSettings["glyph"] = "JBrowse/View/FeatureGlyph/Segments"
+        self.extraSettings["subfeatureClasses"] = "match_part"
     
     def validateData(self):
         return

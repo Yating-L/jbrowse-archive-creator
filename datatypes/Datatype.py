@@ -48,7 +48,7 @@ class Datatype(object):
 
     @staticmethod
     def pre_init(reference_genome, two_bit_path, chrom_sizes_file,
-                 extra_files_path, tool_directory, specie_folder, tracks_folder, binary_folder):
+                 extra_files_path, tool_directory, specie_folder, tracks_folder, binary_folder, track_type):
         Datatype.extra_files_path = extra_files_path
         Datatype.tool_directory = tool_directory
 
@@ -62,6 +62,7 @@ class Datatype(object):
         # 2bit file creation from input fasta
         Datatype.twoBitFile = two_bit_path
         Datatype.chromSizesFile = chrom_sizes_file
+        Datatype.trackType = track_type
     
     def generateCustomTrack(self):
         self.validateData()
