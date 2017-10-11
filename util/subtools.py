@@ -322,5 +322,24 @@ def validateFiles(input_file, chrom_sizes_file_name, file_type, options=None):
 
 def arrow_add_organism(genome_name, mySpecieFolderPath):
     array_call = ['arrow', 'organisms', 'add_organism', '--public', genome_name, mySpecieFolderPath]
-    p = _handleExceptionAndCheckCall(array_call)
+    p = subprocess.check_output(array_call)
     return p
+
+def arrow_create_user(user_email, firstname, lastname, password, options=None):
+    array_call = ['arrow', 'users', 'create_user', user_email, firstname, lastname, password]
+    p = subprocess.check_output(array_call)
+    return p
+
+def arrow_update_organism_permissions(user_id, organism, options=None):
+    array_call = ['arrow', 'users', 'update_organism_permissions', str(user_id), str(organism), '--administrate']
+    p = subprocess.check_output(array_call)
+    return p
+
+def arrow_get_users(user_email):
+    array_call = ['arrow', 'users', 'get_users']
+    p = subprocess.check_output(array_call)
+    all_users = json.loads(p)
+    for d  in all_users:
+        if d['username'] == user_email:
+            return d['userId']
+    logging.error("Cannot find user %s", user_email)

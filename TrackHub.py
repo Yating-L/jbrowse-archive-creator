@@ -16,7 +16,7 @@ from util import santitizer
 
 
 class TrackHub:
-    def __init__(self, inputFastaFile, user_email, outputFile, extra_files_path, tool_directory, trackType=None, apollo_host=None):
+    def __init__(self, inputFastaFile, user_email, outputFile, extra_files_path, tool_directory, trackType, apollo_host, apollo_user):
         
         self.rootAssemblyHub = None
 
@@ -27,6 +27,8 @@ class TrackHub:
         self.myBinaryFolderPath = None
         self.tool_directory = tool_directory
         self.trackType = trackType
+        self.apollo_host = apollo_host
+        self.apollo_user = apollo_user
 
         self.reference_genome = inputFastaFile
         # TODO: Add the specie name
@@ -59,13 +61,13 @@ class TrackHub:
         self.prepareRefseq()
         self.trackList = os.path.join(self.mySpecieFolderPath, "trackList.json")
         self.createTrackList()
-        self.apollo_host = apollo_host
+        
         self.cssFolderPath = os.path.join(self.mySpecieFolderPath, 'css')
         self.cssFilePath = os.path.join(self.cssFolderPath, 'custom_track_styles.css')
         self.logger = logging.getLogger(__name__)
-        
 
     
+
     def addTrack(self, trackDbObject):
         if trackDbObject['dataType'].lower() == 'bam':
             #new_track = subprocess.Popen(['echo', trackDbObject['options']], stdout=subprocess.PIPE)
@@ -172,8 +174,32 @@ class TrackHub:
             track.truncate()
         self.logger.debug("added customized css url to trackList.json")
     '''
+    def createApolloUser(self, options=None):
+        email = self.apollo_user.user_email
+        firstname = self.apollo_user.firstname
+        lastname = self.apollo_user.lastname
+        password = self.apollo_user.password
+        p = subtools.arrow_create_user(email, firstname, lastname, password, options) 
+        user_info = json.loads(p)
+        user_id = user_info.get('userId')
+        if not user_id:
+            self.logger.debug("Cannot create new user: %s; The user may already exist", email)
+            user_id = subtools.arrow_get_users(email)
+        return user_id   
+
+    def grantPermission(self, user_id, organism_id):
+        subtools.arrow_update_organism_permissions(user_id, organism_id)
+
     def addOrganism(self):
-        subtools.arrow_add_organism(self.genome_name, self.mySpecieFolderPath)
+        p = subtools.arrow_add_organism(self.genome_name, self.mySpecieFolderPath)
+        organism = json.loads(p)
+        organism_id = organism['id']
+        return organism_id
+
+    def loadHubToApollo(self, options=None):
+        user_id = self.createApolloUser()
+        organism_id = self.addOrganism()
+        self.grantPermission(user_id, organism_id)
 
 
     def outHtml(self):
@@ -184,8 +210,7 @@ class TrackHub:
             htmlfile.write(htmlstr)     
 
     def makeArchive(self):
-        #self.addCustimizedCss()
-        self.addOrganism()
+        self.loadHubToApollo()
         self.outHtml()
         
         
