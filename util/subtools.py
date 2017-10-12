@@ -297,6 +297,16 @@ def add_track_json(trackList, track_json):
     p = subprocess.call(['add-track-json.pl', trackList], stdin=new_track.stdout)
     return p
 
+def prepare_refseqs(fasta_file_name, outputFolder):
+    array_call = ['prepare-refseqs.pl', '--fasta', fasta_file_name, '--out', outputFolder]
+    p = _handleExceptionAndCheckCall(array_call)
+    return p       
+
+def generate_names(outputFolder):
+    array_call = ['generate-names.pl', '-v', '--out', outputFolder]
+    p = _handleExceptionAndCheckCall(array_call)
+    return p  
+   
 def validateFiles(input_file, chrom_sizes_file_name, file_type, options=None):
     """
     Call validateFiles on input_file, using chrom_sizes_file_name and file_type
@@ -320,18 +330,35 @@ def validateFiles(input_file, chrom_sizes_file_name, file_type, options=None):
     p = _handleExceptionAndCheckCall(array_call)
     return p
 
-def arrow_add_organism(genome_name, mySpecieFolderPath):
-    array_call = ['arrow', 'organisms', 'add_organism', '--public', genome_name, mySpecieFolderPath]
+def arrow_add_organism(organism_name, organism_dir, public=False):
+    array_call = ['arrow', 'organisms', 'add_organism', organism_name, organism_dir]
+    if public:
+        array_call.append('--public')
     p = subprocess.check_output(array_call)
     return p
 
-def arrow_create_user(user_email, firstname, lastname, password, options=None):
+def arrow_create_user(user_email, firstname, lastname, password, admin=False):
+    """ Create a new user of Apollo, the default user_role is "user" """
     array_call = ['arrow', 'users', 'create_user', user_email, firstname, lastname, password]
+    if admin:
+        array_call += ['--role', 'admin']
     p = subprocess.check_output(array_call)
     return p
 
-def arrow_update_organism_permissions(user_id, organism, options=None):
-    array_call = ['arrow', 'users', 'update_organism_permissions', str(user_id), str(organism), '--administrate']
+def arrow_update_organism_permissions(user_id, organism, **user_permissions):
+    array_call = ['arrow', 'users', 'update_organism_permissions', str(user_id), str(organism)]
+    admin = user_permissions.get("admin", False)
+    write = user_permissions.get("write", False)
+    read = user_permissions.get("read", False)
+    export = user_permissions.get("export", False)
+    if admin:
+        array_call.append('--administrate')
+    if write:
+        array_call.append('--write')
+    if read:
+        array_call.append('--read')
+    if export:
+        array_call.append('--export')
     p = subprocess.check_output(array_call)
     return p
 

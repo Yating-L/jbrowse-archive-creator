@@ -5,7 +5,7 @@
 Super Class of the managed datatype
 """
 
-
+import  logging
 from datatypes.Datatype import Datatype
 
 
@@ -13,9 +13,11 @@ class Interval(Datatype):
 
     def __init__(self):
         super(Interval, self).__init__()
-        #self.trackType = "CanvasFeatures"
-        if not self.trackType:
+        if not Datatype.trackType:
             self.trackType = "HTMLFeatures"
+        else:
+            self.trackType = Datatype.trackType
+        logging.debug("Set default trackType = %s for feature tracks", self.trackType)
         self.trackFileType = "gff"
 
 

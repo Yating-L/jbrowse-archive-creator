@@ -20,7 +20,7 @@ from datatypes.interval.BedBlatAlignments import BedBlatAlignments
 from datatypes.interval.BedBlastAlignments import BedBlastAlignments
 from datatypes.interval.Psl import Psl
 from datatypes.sequence.Fasta import Fasta
-from ApolloUser import ApolloUser
+from apollo.ApolloUser import ApolloUser
 from util import santitizer 
 
 class Reader(object):

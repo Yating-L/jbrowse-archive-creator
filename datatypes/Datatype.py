@@ -12,7 +12,10 @@ from util import subtools
 import logging
 import abc
 from abc import ABCMeta
-from TrackDb import TrackDb
+from tracks.HTMLFeatures import HTMLFeatures
+from tracks.CanvasFeatures import CanvasFeatures
+from tracks.BamFeatures import BamFeatures
+from tracks.BigwigFeatures import BigwigFeatures
 from datatypes.validators.DataValidation import DataValidation
 
 
@@ -27,6 +30,8 @@ class Datatype(object):
     mySpecieFolderPath = None
     myTrackFolderPath = None
     myBinaryFolderPath = None
+    
+    trackType = None
 
     def __init__(self):
         not_init_message = "The {0} is not initialized." \
@@ -47,7 +52,7 @@ class Datatype(object):
         
 
     @staticmethod
-    def pre_init(reference_genome, two_bit_path, chrom_sizes_file,
+    def pre_init(reference_genome, chrom_sizes_file,
                  extra_files_path, tool_directory, specie_folder, tracks_folder, binary_folder, track_type):
         Datatype.extra_files_path = extra_files_path
         Datatype.tool_directory = tool_directory
@@ -60,9 +65,10 @@ class Datatype(object):
         Datatype.input_fasta_file = reference_genome
 
         # 2bit file creation from input fasta
-        Datatype.twoBitFile = two_bit_path
+        #Datatype.twoBitFile = two_bit_path
         Datatype.chromSizesFile = chrom_sizes_file
         Datatype.trackType = track_type
+        
     
     def generateCustomTrack(self):
         self.validateData()
@@ -99,6 +105,18 @@ class Datatype(object):
         """Create the final track file"""
 
     def createTrackDb(self):
-        self.track = TrackDb(self.trackName, self.trackLabel, self.trackDataURL, self.trackType, self.dataType, self.extraSettings)
+        if self.trackType == 'HTMLFeatures':
+            self.track = HTMLFeatures(self.trackName, self.trackLabel, self.trackDataURL, self.trackType, self.dataType, self.extraSettings)
+        elif self.trackType == "CanvasFeatures":
+            self.track = CanvasFeatures(self.trackName, self.trackLabel, self.trackDataURL, self.trackType, self.dataType, self.extraSettings)
+        elif self.trackType == "bam":
+            self.track = BamFeatures(self.trackName, self.trackLabel, self.trackDataURL, self.trackType, self.dataType, self.extraSettings)
+        elif self.trackType == "bigwig":
+            self.track = BigwigFeatures(self.trackName, self.trackLabel, self.trackDataURL, self.trackType, self.dataType, self.extraSettings)
+        else:
+            logging.error("Cannot createTrackDb, because trackType is not defined or invalid! trackType = %s", self.trackType)
+        self.track.createTrackDb()
+            
+        #self.track = TrackDb(self.trackName, self.trackLabel, self.trackDataURL, self.trackType, self.dataType, self.extraSettings)
 
     
