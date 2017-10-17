@@ -342,7 +342,10 @@ def arrow_create_user(user_email, firstname, lastname, password, admin=False):
     array_call = ['arrow', 'users', 'create_user', user_email, firstname, lastname, password]
     if admin:
         array_call += ['--role', 'admin']
+    logging.debug("%s", array_call)
+    print array_call
     p = subprocess.check_output(array_call)
+    print ("p = %s", p)
     return p
 
 def arrow_update_organism_permissions(user_id, organism, **user_permissions):
@@ -364,9 +367,12 @@ def arrow_update_organism_permissions(user_id, organism, **user_permissions):
 
 def arrow_get_users(user_email):
     array_call = ['arrow', 'users', 'get_users']
+    logging.debug("%s", array_call)
+    print array_call
     p = subprocess.check_output(array_call)
     all_users = json.loads(p)
     for d  in all_users:
         if d['username'] == user_email:
             return d['userId']
     logging.error("Cannot find user %s", user_email)
+

@@ -74,6 +74,10 @@ class Reader(object):
         track_type = self.args.get("track_type")
         return track_type
     
+    def getApolloPath(self):
+        apollo_path = self.args.get("apollo_path")
+        return apollo_path
+    
     def getApolloHost(self):
         apollo_host = self.args.get("apollo_host")
         return apollo_host

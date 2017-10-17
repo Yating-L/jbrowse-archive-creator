@@ -1,12 +1,44 @@
 #!/usr/bin/env python
+import os
 import json
+import shutil
+import tempfile
 import logging
 from util import subtools
+from mako.lookup import TemplateLookup
+
 
 class ApolloInstance(object):
-    def __init__(self, apollo_host):
+    def __init__(self, apollo_host, tool_directory, user_email):
         self.apollo_host = apollo_host
+        self.tool_directory = tool_directory
+        self.default_user = user_email
         self.logger = logging.getLogger(__name__)
+        self.apolloTemplate = self._getApolloTemplate()
+        self._arrow_init()
+    
+    #TODO: Encode password
+    def _arrow_init(self):
+        arrow_config = tempfile.NamedTemporaryFile(bufsize=0)
+        with open(arrow_config.name, 'w') as conf:
+            htmlMakoRendered = self.apolloTemplate.render(
+            apollo_host = self.apollo_host,
+            admin_user = self.default_user,
+            admin_pw = '1234'
+        )
+            conf.write(htmlMakoRendered)
+
+        home_dir = os.path.expanduser('~')
+        arrow_config_dir = os.path.join(home_dir, '.apollo-arrow.yml')
+        shutil.copyfile(arrow_config.name, arrow_config_dir)
+        self.logger.debug("Initated arrow: apollo-arrow.yml= %s", arrow_config_dir)
+
+
+    def _getApolloTemplate(self):
+        mylookup = TemplateLookup(directories=[os.path.join(self.tool_directory, 'templates')],
+                                  output_encoding='utf-8', encoding_errors='replace')
+        apolloTemplate = mylookup.get_template("apollo-arrow.yml")
+        return apolloTemplate
 
     def getHost(self):
         return self.apollo_host

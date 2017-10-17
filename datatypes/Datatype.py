@@ -88,16 +88,16 @@ class Datatype(object):
         #Initialize required fields: trackName, longLabel, shortLable
         self.trackName = self.trackSettings["name"]
         self.trackDataURL = os.path.join(self.myTrackFolderPath, self.trackName)
-        if self.trackSettings["label"]:
-            self.trackLabel = self.trackSettings["label"]
+        if self.trackSettings["long_label"]:
+            self.trackLabel = self.trackSettings["long_label"]
         else:
             self.trackLabel = self.trackName
         if "trackType" in self.trackSettings and self.trackSettings["trackType"]:
             self.trackType = self.trackSettings["trackType"]
-        if self.trackSettings["category"]:
-            self.extraSettings["category"] = self.trackSettings["category"]
-        if "color" in self.trackSettings and self.trackSettings["color"]:
-            self.extraSettings["color"] = self.trackSettings["color"]
+        if self.trackSettings["group_name"]:
+            self.extraSettings["category"] = self.trackSettings["group_name"]
+        if "track_color" in self.trackSettings and self.trackSettings["track_color"]:
+            self.extraSettings["color"] = self.trackSettings["track_color"]
         
         
     @abc.abstractmethod

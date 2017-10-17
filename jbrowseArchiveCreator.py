@@ -40,6 +40,7 @@ def main(argv):
     debug_mode = reader.getDebugMode()
     track_type = reader.getTrackType()
     #jbrowse_path = reader.getJBrowsePath()
+    apollo_path = reader.getApolloPath()
     apollo_host = reader.getApolloHost()
     apollo_user = reader.getApolloUser()
  
@@ -54,7 +55,7 @@ def main(argv):
  
     # Create the Track Hub folder
     logging.info('#### JBrowseArchiveCreator: Creating the Track Hub folder ####\n')
-    trackHub = TrackHub(reference_genome, apollo_user, outputFile, extra_files_path, toolDirectory, track_type, apollo_host)
+    trackHub = TrackHub(reference_genome, apollo_user, outputFile, extra_files_path, toolDirectory, track_type, apollo_host, user_email) 
 
     # Create Ordered Dictionary to add the tracks in the tool form order
     logging.info('#### JBrowseArchiveCreator: Preparing track data ####\n')

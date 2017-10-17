@@ -1,13 +1,14 @@
 <tool id="jbrowse_hub" name="JBrowse Archive Creator" version="1.0.1">
     <description>
-        This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse
+        This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse with Apollo plugin
     </description>
 
     <requirements>
         <requirement type="package" version="1.2">samtools</requirement>
         <requirement type="package" version="1.9">numpy</requirement>
         <requirement type="package" version="1.68">biopython</requirement>
-        <requirement type="package" version="1.0">ucsc_tools_340</requirement>
+        <requirement type="package" version="340">ucsc_hac</requirement>
+        <requirement type="package" version="3.0.3">apollo_api</requirement>
         <requirement type="package" version="1.12.1">jbrowse_tools</requirement>
     </requirements>
 
@@ -15,103 +16,212 @@
     </stdio>
 
     <command detect_errors="exit_code"><![CDATA[
-        python $__tool_directory__/jbrowse_hub.py 
-        --fasta '$reference' 
-        --genome_name '$genome_name'
-
-        #set galaxy_url = str($GALAXY_URL)
-        #set $jbrowse_url = galaxy_url.replace("8080", "80")
-        --jbrowse_host '$jbrowse_url'
+        mkdir -p $output.extra_files_path;
         
-        ## json metadata recording from Remi's hub-archive-creator.xml
-        #import json
-        #set global data_parameter_dict = {}
+        ## Dump the tool parameters into a JSON file 
+        python $json_file parameters.json;
 
-        ## Function to retrieve the data of the inputs
-        #def prepare_json($input_to_prepare, $extra_data_dict={})
-            #set false_path = str($input_to_prepare)
-            #set name = $input_to_prepare.name
-
-            #set data_dict = {"name": $name}
-            #silent data_dict.update($extra_data_dict)
-
-            #silent $data_parameter_dict.update({$false_path: $data_dict})
-
-        #end def
-
-        #for $g in $group
-        #for $f in $g.format
-            #set track_label =  str($f.formatChoice.label)
-            #set group_name = str($g.group_name)
-            #set extra_data_dict = {"label" : $track_label, "category" : $group_name} 
-            #if $f.formatChoice.format_select == 'bed'
-                #set track_color = str($f.formatChoice.track_color)
-                #silent extra_data_dict.update({"color" : $track_color})
-                #if $f.formatChoice.bedChoice.bed_select == 'bed_generic_option'
-                    --bed $f.formatChoice.bedChoice.BED_generic
-                    #silent $prepare_json($f.formatChoice.bedChoice.BED_generic, extra_data_dict)
-                #elif $f.formatChoice.bedChoice.bed_select == 'bed_simple_repeats_option'
-                    --bedSimpleRepeats $f.formatChoice.bedChoice.BED_simple_repeats
-                    #silent $prepare_json($f.formatChoice.bedChoice.BED_simple_repeats, extra_data_dict)
-                #elif $f.formatChoice.bedChoice.bed_select == 'bed_splice_junctions_option'
-                    --bedSpliceJunctions $f.formatChoice.bedChoice.BED_splice_junctions
-                    #silent $prepare_json($f.formatChoice.bedChoice.BED_splice_junctions, extra_data_dict)
-                #elif $f.formatChoice.bedChoice.bed_select == 'bigpsl'
-                    --bigpsl $f.formatChoice.bedChoice.BigPsl
-                    #silent $prepare_json($f.formatChoice.bedChoice.BigPsl, extra_data_dict)
-                #end if
-            #end if
-            #if $f.formatChoice.format_select == 'bam'
-                --bam $f.formatChoice.BAM
-                #silent $prepare_json($f.formatChoice.BAM, extra_data_dict)
-            #end if
-            #if $f.formatChoice.format_select == 'gff3'
-                #set track_color = str($f.formatChoice.track_color)
-                #silent extra_data_dict.update({"color" : $track_color})
-                #if $f.formatChoice.gff3Choice.gff3_select == 'gff3_generic'
-                    --gff3 $f.formatChoice.gff3Choice.GFF3_generic
-                    #silent $prepare_json($f.formatChoice.gff3Choice.GFF3_generic, extra_data_dict)
-                #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_transcript'
-                    --gff3_transcript $f.formatChoice.gff3Choice.GFF3_transcript
-                    #silent $prepare_json($f.formatChoice.gff3Choice.GFF3_transcript, extra_data_dict)
-                #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_mrna'
-                    --gff3_mrna $f.formatChoice.gff3Choice.GFF3_mrna
-                    #silent $prepare_json($f.formatChoice.gff3Choice.GFF3_mrna, extra_data_dict)
-                #end if
-            #end if
-            #if $f.formatChoice.format_select == 'blastxml'
-                --blastxml $f.formatChoice.BlastXML
-                #set track_color = str($f.formatChoice.track_color)
-                #silent extra_data_dict.update({"color" : $track_color})
-                #silent $prepare_json($f.formatChoice.BlastXML, extra_data_dict)
-            #end if
-            #if $f.formatChoice.format_select == 'gtf'
-                --gtf $f.formatChoice.GTF
-                #set track_color = str($f.formatChoice.track_color)
-                #silent extra_data_dict.update({"color" : $track_color})
-                #silent $prepare_json($f.formatChoice.GTF, extra_data_dict)
-            #end if
-            #if $f.formatChoice.format_select == 'bigwig'
-                --bigwig $f.formatChoice.BIGWIG
-                #set pos_color = str($f.formatChoice.pos_color)
-                #set neg_color = str($f.formatChoice.neg_color)
-                #silent $extra_data_dict.update({"style" : {"pos_color" : $pos_color, "neg_color" : $neg_color}})
-                #silent $prepare_json($f.formatChoice.BIGWIG, extra_data_dict)
-            #end if
-       #end for
-       #end for
-
-       #set all_data_json = json.dumps($data_parameter_dict)
-       -j '$all_data_json'
-       -e '$output.extra_files_path'
-       -o '$output'
-
+        python $__tool_directory__/jbrowseArchiveCreator.py --data_json parameters.json -o $output
     ]]></command>
+    <configfiles>
+        <configfile name="json_file">
+import json
+import sys
+
+file_path = sys.argv[1]
+#set global data_parameter_dict = {}
+
+## Ask the user to enter the genome name
+#silent $data_parameter_dict.update({"genome_name": str($genome_name)})
+#silent $data_parameter_dict.update({"apollo_host": str($apollo_host)})
+#if $apollo_users_settings.apollo_users_selector == "yes":
+    #set apollo_user = {"firstname": str($apollo_users_settings.firstname), "lastname": str($apollo_users_settings.lastname), "password": str($apollo_users_settings.password), "user_email": str($apollo_users_settings.user_email)}
+    $data_parameter_dict.update({"apollo_user": $apollo_user})
+#end if 
+
+## Function to retrieve the data of the inputs
+#def prepare_json($datatype, $input_to_prepare, $order_index, $extra_data_dict={})
+    #set false_path = str($input_to_prepare)
+    #set $data_dict = {"false_path": $false_path}
+
+    #set name = str($input_to_prepare.name)
+    #silent $data_dict.update({"name": $name})
+    #silent $data_dict.update($extra_data_dict)
+    ## Add the ordering by taking the tool form indexes
+    #silent $data_dict.update({"order_index": $order_index})
+
+    #if $datatype in $data_parameter_dict
+        #silent $data_parameter_dict[$datatype].append($data_dict)
+    #else
+        #set array_inputs = []
+        #silent $array_inputs.append($data_dict)
+        #silent $data_parameter_dict.update({$datatype: $array_inputs})
+    #end if 
+#end def
+
+## Get the number of digits from tracks, to have a unique integer from group index and track index
+
+#set temp_max_digit = 0
+
+#for $g in $group
+    #if len($g.format) > $temp_max_digit
+        #silent temp_max_digit = len($g.format)
+    #end if
+#end for
+
+#set nb_digits_max_track = len(str($temp_max_digit))
+
+## END Get the number of digits
+
+#for $i_g, $g in enumerate( $group )
+    #for $i, $f in enumerate( $g.format )
+        ## Create the order index using index_group+1 concatenated with index_track
+        #set index_group_final = str($i_g + 1)
+        #set index_track_final = str($index_group_final) + str($i).zfill($nb_digits_max_track)
+
+        ## For each format, we have a few mandatory fields we store in a dict
+        #set track_color = str($f.formatChoice.track_color)
+        #set group_name = str($g.group_name)
+        #set longLabel = str($f.formatChoice.longLabel)
+        #set extra_data_dict = {"track_color": $track_color,
+                                "group_name": $group_name,
+                                "long_label": $longLabel}
+        #if $f.formatChoice.format_select == "bam"
+            #set bam_index = $f.formatChoice.BAM.metadata.bam_index
+
+            ## Add Bam format specific fields
+            #silent $extra_data_dict.update({"index": $bam_index})
+
+            #silent $prepare_json("Bam", $f.formatChoice.BAM, $index_track_final, $extra_data_dict)
+        #end if
+        #if $f.formatChoice.format_select == "bed"
+            #if $f.formatChoice.bedChoice.bed_select == "bed_generic"
+                #silent $prepare_json("Bed", $f.formatChoice.bedChoice.BED, $index_track_final,
+                                                $extra_data_dict)
+            #end if
+            #if $f.formatChoice.bedChoice.bed_select == "bed_simple_repeats_option"
+                #silent $prepare_json("BedSimpleRepeats", $f.formatChoice.bedChoice.BED_simple_repeats, $index_track_final,
+                                                $extra_data_dict)
+            #end if
+            #if $f.formatChoice.bedChoice.bed_select == "bed_splice_junctions_option"
+                #silent $prepare_json("BedSpliceJunctions", $f.formatChoice.bedChoice.BED_splice_junctions, $index_track_final,
+                                                $extra_data_dict)
+            #end if
+            #if $f.formatChoice.bedChoice.bed_select == "bed_blast_alignment_option"
+                ##set database = str($f.formatChoice.bedChoice.database)
+                ##silent $extra_data_dict.update({"database": $database})
+                #silent $prepare_json("BedBlastAlignments", $f.formatChoice.bedChoice.BED_blast_alignment, $index_track_final,
+                                             $extra_data_dict)
+            #end if
+            #if $f.formatChoice.bedChoice.bed_select == "bed_blat_alignment_option"
+                ##set database = str($f.formatChoice.bedChoice.database)
+                ##silent $extra_data_dict.update({"database": $database})
+                #silent $prepare_json("BedBlatAlignments", $f.formatChoice.bedChoice.BED_blat_alignment, $index_track_final,
+                                             $extra_data_dict)
+            #end if
+        #end if
+        #if $f.formatChoice.format_select == "blastxml"
+                #silent $prepare_json($f.formatChoice.BlastXML, extra_data_dict)
+        #end if
+        #if $f.formatChoice.format_select == "bigwig"
+            #set pos_color = str($f.formatChoice.pos_color)
+            #set neg_color = str($f.formatChoice.neg_color)
+            #silent $extra_data_dict.update({"style" : {"pos_color" : $pos_color, "neg_color" : $neg_color}})
+            #silent $prepare_json("BigWig", $f.formatChoice.BIGWIG, $index_track_final,
+                                            $extra_data_dict)
+        #end if
+        #if $f.formatChoice.format_select == 'gff3'
+            #if $f.formatChoice.gff3Choice.gff3_select == 'gff3_generic'
+                #silent $prepare_json("Gff3", $f.formatChoice.GFF3, $index_track_final,
+                                            $extra_data_dict)
+            #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_transcript'
+                #silent $prepare_json("Gff3_transcript", $f.formatChoice.GFF3, $index_track_final,
+                                            $extra_data_dict)
+            #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_mrna'
+                #silent $prepare_json("Gff3_mrna", $f.formatChoice.GFF3, $index_track_final,
+                                            $extra_data_dict)
+            #end if
+        #end if
+        #if $f.formatChoice.format_select == "gtf"
+            ## Add also GTF from Agustus? See https://github.com/ENCODE-DCC/kentUtils/issues/8
+            #silent $prepare_json("Gtf", $f.formatChoice.GTF, $index_track_final,
+                                             $extra_data_dict)
+        #end if
+    #end for
+#end for
+
+## We combine the fasta file dataset name with his false path in a JSON object
+#set fasta_json = {"false_path": str($fasta_file), "name": str($fasta_file.name)}
+$data_parameter_dict.update({"fasta": $fasta_json})
+
+## Retrieve the user email
+#silent $data_parameter_dict.update({"user_email": str($__user_email__)})
+
+#silent $data_parameter_dict.update({"tool_directory": str($__tool_directory__)})
+
+#silent $data_parameter_dict.update({"extra_files_path": str($output.extra_files_path)})
+
+#silent $data_parameter_dict.update({"debug_mode": str($advanced_options.debug_mode)})
+
+with open(file_path, 'w') as f:
+    json.dump($data_parameter_dict, f)
+        </configfile>
+    </configfiles>
 
     <inputs>
-        <param name="GALAXY_URL" type="baseurl" value="" />
-        <param name="reference" type="data" format="fasta" label="Reference Genome" />
-        <param name="genome_name" type="text" size="30" value="unknown" label="Genome name" />
+        <param
+                name="genome_name"
+                type="text"
+                size="30"
+                value="unknown"
+                label="JBrowse Hub Name"
+        />
+        <param
+                format="fasta"
+                name="fasta_file"
+                type="data"
+                label="Reference genome"
+        />
+        <param
+                name="apollo_host"
+                type="text"
+                label="Apollo host"
+        />
+        <conditional name="apollo_users_settings">
+            <param name="apollo_users_selector" type="select" label="Create or specify your Apollo account">
+                <option value="no" selected="true">Use exist demo user account (will use your galaxy email address for apollo, password: gonramp) </option>
+                <option value="yes">Create or use your own Apollo account</option>
+            </param>
+            <!-- TODO: Avoid redundancy here -->
+            <when value="yes">
+                <param
+                    name="firstname"
+                    type="text"
+                    label="First Name"
+                />
+                <param
+                    name="lastname"
+                    type="text"
+                    label="Last Name"
+                />
+                <param
+                    name="user_email"
+                    type="text"
+                    label="Email Address"
+                />
+                <param
+                    name="password"
+                    type="text"
+                    label="Password"
+                />
+            </when>
+            <when value="no">
+                <param name="default_user" type="hidden"
+                       value="false">
+                </param>
+            </when>
+        </conditional>
+        
         <repeat name="group" title="New group">
             <param type="text" name="group_name" label="Group name" value="Default group"/>
             <repeat name="format" title="New track">
@@ -132,17 +242,25 @@
                                 type="data"
                                 label="BAM File"
                         />
-                        <param name="label" type="text" size="30" value = "Sequence Alignment" label="Track name" />
+                        <param name="longLabel" type="text" size="30" value = "Sequence Alignment" label="Track label" />
+                        <param name="track_color" type="color" label="Track color" value="#000000">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
                     </when>     
                     <when value="bed">
                         <conditional name="bedChoice">
                             <param name="bed_select" type="select" label="Bed Choice">
-                                <option value="bed_generic_option">BED format</option>
+                                <option value="bed_generic">BED format</option>
                                 <option value="bed_simple_repeats_option">BED Simple repeat (bed4+12 / simpleRepeat.as)</option>
                                 <option value="bed_splice_junctions_option">BED Splice junctions (bed12+1 / spliceJunctions.as)</option>
-                                <option value="bigpsl">Blat Alignment (bed12+12 / bigPsl.as)</option>
+                                <option value="bed_blast_alignment_option">Blast alignments (bed12+12 / bigPsl.as)</option>
+                                <option value="bed_blat_alignment_option">BLAT alignments (bigPsl / bigPsl.as)</option>
                             </param>
-                            <when value="bed_generic_option">
+                            <when value="bed_generic">
                                 <param
                                         format="bed"
                                         name="BED_generic"
@@ -166,17 +284,25 @@
                                         label="Bed Splice Junctions (Bed12+1) File"
                                 />
                             </when>
-                            <when value="bigpsl">
+                            <when value="bed_blast_alignment_option">
                                 <param
-                                    format="bed"
-                                    name="BigPsl"
-                                    type="data"
-                                    label="Blat Alignments File"
+                                        format="bed"
+                                        name="BED_blast_alignment"
+                                        type="data"
+                                        label="Bed Blast Alignments (Bed12+12) File"
+                                />
+                            </when>
+                            <when value="bed_blat_alignment_option">
+                                <param
+                                        format="bed"
+                                        name="BED_blat_alignment"
+                                        type="data"
+                                        label="Bed BLAT Alignments (bigPsl) File"
                                 />
                             </when>
                         </conditional>
-                        <param name="label" type="text" size="30" value="BED file" label="Track name" />
-                        <param name="track_color" type="color" label="Track color" value="#daa520">
+                        <param name="longLabel" type="text" size="30" label="Track label" />
+                        <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>
                                 <valid initial="string.letters,string.digits">
                                     <add value="#"/>
@@ -191,8 +317,8 @@
                                 type="data"
                                 label="Blast Alignments File"
                         />
-                        <param name="label" type="text" size="30" value="Blast Alignment" label="Track name" />
-                        <param name="track_color" type="color" label="Track color" value="#daa520">
+                        <param name="longLabel" type="text" size="30" value="Blast Alignment" label="Track label" />
+                        <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>
                                 <valid initial="string.letters,string.digits">
                                     <add value="#"/>
@@ -207,15 +333,8 @@
                                 type="data"
                                 label="BIGWIG File"
                         />
-                        <param name="label" type="text" size="30" value="Sequence Coverage" label="Track name" />
-                        <param name="pos_color" type="color" label="Positive Coverage Color" value="#FFA600">
-                            <sanitizer>
-                                <valid initial="string.letters,string.digits">
-                                    <add value="#"/>
-                                </valid>
-                            </sanitizer>
-                        </param>
-                        <param name="neg_color" type="color" label="Negative Coverage Color" value="#005EFF">
+                        <param name="longLabel" type="text" size="30" value="Sequence Coverage" label="Track label" />
+                        <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>
                                 <valid initial="string.letters,string.digits">
                                     <add value="#"/>
@@ -255,7 +374,7 @@
                                 />
                             </when>
                         </conditional>
-                        <param name="label" type="text" size="30" value="Gene Prediction" label="Track name" />
+                        <param name="longLabel" type="text" size="30" value="Gene Prediction" label="Track name" />
                         <param name="track_color" type="color" label="Track color" value="#daa520">
                             <sanitizer>
                                 <valid initial="string.letters,string.digits">
@@ -271,8 +390,8 @@
                                 type="data"
                                 label="GTF File"
                         />
-                        <param name="label" type="text" size="30" value="Assembled Transcripts" label="Track name" />
-                        <param name="track_color" type="color" label="Track color" value="#daa520">
+                        <param name="longLabel" type="text" size="30" value="Assembled Transcripts" label="Track name" />
+                        <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>
                                 <valid initial="string.letters,string.digits">
                                     <add value="#"/>
@@ -283,6 +402,27 @@
                 </conditional>
             </repeat>
         </repeat>
+        <conditional name="advanced_options">
+            <param name="advanced_options_selector" type="select" label="Advanced options">
+                <option value="off" selected="true">Hide advanced options</option>
+                <option value="on">Display advanced options</option>
+            </param>
+            <!-- TODO: Avoid redundancy here -->
+            <when value="on">
+                <param name="debug_mode" type="select" label="Activate debug mode"> 
+                    <option value="false" selected="true">No</option>
+                    <option value="true">Yes</option>
+                    <help>
+                        Use this option if you are a G-OnRamp developer
+                    </help>
+                </param>
+            </when>
+            <when value="off">
+                <param name="debug_mode" type="hidden"
+                       value="false">
+                </param>
+            </when>
+        </conditional>
     </inputs>
 
     <outputs>
@@ -300,7 +440,7 @@
         </test>
     </tests>
     <help>
-        This Galaxy tool will create a tar file which including raw datasets and json datasets that can be used for
+        This Galaxy tool will create a jbrowse hub which including binary datasets and json datasets that can be used for
         JBrowse visualization.
     </help>
     <citations>

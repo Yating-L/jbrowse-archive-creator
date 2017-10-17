@@ -16,7 +16,7 @@ from util import santitizer
 
 
 class TrackHub:
-    def __init__(self, inputFastaFile, apollo_user, outputFile, extra_files_path, tool_directory, trackType, apollo_host):
+    def __init__(self, inputFastaFile, apollo_user, outputFile, extra_files_path, tool_directory, trackType, apollo_host, user_email):
         
         self.rootAssemblyHub = None
 
@@ -37,7 +37,7 @@ class TrackHub:
         self.chromSizesFile = None
 
         # Set up apollo
-        self.apollo = ApolloInstance(apollo_host)
+        self.apollo = ApolloInstance(apollo_host, tool_directory, user_email)
         self.apollo_user = apollo_user
         
         # Set all the missing variables of this class, and create physically the folders/files
@@ -124,9 +124,18 @@ class TrackHub:
             htmlfile.write(htmlstr)     
 
     def _makeArchive(self):
-        self.apollo.loadHubToApollo(self.apollo_user, self.genome_name, self.mySpecieFolderPath, admin=True)
+        jbrowse_hub_dir = self._getHubDir()
+        self.apollo.loadHubToApollo(self.apollo_user, self.genome_name, jbrowse_hub_dir, admin=True)
         apollo_host = self.apollo.getHost()
         self._outHtml(apollo_host)
+
+    def _getHubDir(self):
+        file_dir = os.path.abspath(self.outputFile)
+        source_dir = os.path.dirname(file_dir)
+        output_folder_name = os.path.basename(self.extra_files_path)
+        species_dir = os.path.relpath(self.mySpecieFolderPath, self.extra_files_path)
+        jbrowse_hub_dir = os.path.join(source_dir, output_folder_name, species_dir)
+        return jbrowse_hub_dir
         
 
     def __createAssemblyHub__(self, extra_files_path):

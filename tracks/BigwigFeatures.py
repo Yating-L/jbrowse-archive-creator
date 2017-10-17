@@ -15,12 +15,22 @@ class BigwigFeatures(TrackDb):
     def prepareExtraSetting(self):
         if 'category' not in self.extraSettings or not self.extraSettings['category']:
             self.extraSettings['category'] = "Default group"
+        if 'color' not in self.extraSettings or not self.extraSettings['color']:
+            self.extraSettings['style'] = {}
+            self.extraSettings['style']['pos_color'] = "#FFA600"
+        else:
+            self.extraSettings['style'] = {}
+            self.extraSettings['style']['pos_color'] = self.extraSettings['color']
+            
+            
+        '''
         if 'style' not in self.extraSettings:
             self.extraSettings['style'] = {}
             if 'pos_color' not in self.extraSettings['style'] or self.extraSettings['style']['pos_color'] == '':
                 self.extraSettings['style']['pos_color'] = "#FFA600"
             if 'neg_color' not in self.extraSettings['style'] or self.extraSettings['style']['neg_color'] == '':
                 self.extraSettings['style']['neg_color'] = "#005EFF"
+        '''
         bigwig_track = dict()
         bigwig_track['urlTemplate'] = os.path.join('bbi', self.trackName)
         bigwig_track['type'] = 'JBrowse/View/Track/Wiggle/XYPlot'

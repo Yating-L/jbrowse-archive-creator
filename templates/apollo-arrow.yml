@@ -1,0 +1,10 @@
+## Apollo's Arrow: Global Configuration File.
+# Each stanza should contian a single galaxy server to control.
+#
+# You can set the key __default to the name of a default instance
+__default: local
+
+local:
+    url: ${apollo_host}
+    username: ${admin_user}
+    password: ${admin_pw}

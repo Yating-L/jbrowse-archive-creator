@@ -4,11 +4,10 @@ This Galaxy tool permits to prepare your files to be ready for JBrowse visualiza
 ## Features
 1. Similar interface to Hub Archive Creator.
 2. Convert tracks to GFF3 datatypes (e.g Blastxml => GFF3) in order to import feature data from the flat files
-3. Generate a zip file including all the tracks and configuration for JBrowse visualization
-4. Group the tracks 
-5. Set the color for each track
-6. Set the label for each track
-7. Create workflows within Galaxy to automatize pipeline analysis and get them ready to visualization inside JBrowse...in a few clicks!
+3. Group the tracks 
+4. Set the color for each track
+5. Set the label for each track
+6. Create workflows within Galaxy to automatize pipeline analysis and get them ready to visualization inside JBrowse...in a few clicks!
 
 At the moment, Supported datatypes are:
 - Bam
@@ -19,6 +18,7 @@ At the moment, Supported datatypes are:
 - Gff3
 - Gtf
 - Blastxml
+- BigPsl
 
 ## Installation:
 1. You would need to add this tool into your Galaxy.
