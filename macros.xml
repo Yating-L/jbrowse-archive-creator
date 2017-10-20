@@ -1,0 +1,32 @@
+<macros>
+    <xml name="verify_hub_structure" token_genome="Dbia3" token_test="common">
+        <extra_files type="directory" value="myHub/@GENOME@/names" compare="re_match"/>
+        <extra_files type="directory" value="myHub/@GENOME@/seq" compare="re_match"/>
+        <extra_files type="directory" value="myHub/@GENOME@/tracks" compare="re_match"/>
+        <extra_files type="file" name="myHub/@GENOME@/css/custom_track_styles.css" value="@TEST@/myHub/@GENOME@/css/custom_track_styles.css" />
+        <extra_files type="file" name="myHub/@GENOME@/tracks.conf" value="@TEST@/myHub/@GENOME@/tracks.conf" />
+        <extra_files type="file" name="myHub/@GENOME@/trackList.json">
+            <assert_contents>
+                <has_text text="tracks"/>
+                <has_text text="css"/>
+                <has_text text="names"/>
+                <has_text text="formatVersion"/>
+            </assert_contents>
+        </extra_files>
+    </xml>
+
+    <xml name="verify_hub_structure_no_track" token_genome="Dbia3" token_test="common">
+        <extra_files type="file" name="myHub/@GENOME@/trackList.json" >
+            <assert_contents>
+                <has_text text="tracks"/>
+                <has_text text="css"/>
+                <has_text text="names"/>
+                <has_text text="formatVersion"/>
+            </assert_contents>
+        </extra_files>
+        <extra_files type="file" name="myHub/@GENOME@/css/custom_track_styles.css" value="@TEST@/myHub/@GENOME@/css/custom_track_styles.css" />
+    </xml>
+
+    
+
+</macros>

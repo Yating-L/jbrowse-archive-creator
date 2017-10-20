@@ -77,23 +77,4 @@ The PYTHONPATH for biopython can be accessed through PYTHONPATH_BIOPYTHON.
          <readme>The perl scripts for converting flat files to json.</readme>
     </package>
 
-    <package name="apollo_api" version="3.0.3">
-        <install version="1.0">
-            <actions>
-                <action type="download_by_url">https://github.com/galaxy-genome-annotation/python-apollo/archive/3.0.3.tar.gz</action>
-                <action type="make_directory">$INSTALL_DIR/apollo</action>
-                <action type="shell_command">
-                    export PYTHONPATH=$PYTHONPATH:$INSTALL_DIR/apollo &amp;&amp; 
-                    python setup.py install --install-lib $INSTALL_DIR/apollo
-                </action>
-                <action type="set_environment">
-                    <environment_variable action="append_to" name="PYTHONPATH">$INSTALL_DIR/apollo</environment_variable>
-                    <environment_variable action="append_to" name="PATH">$INSTALL_DIR/apollo</environment_variable>
-                </action>
-            </actions>
-        </install>
-    </package>
-
-
-    
 </tool_dependency>

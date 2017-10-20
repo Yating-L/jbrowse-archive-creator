@@ -7,16 +7,16 @@ import zipfile
 import json
 import tempfile
 import logging
+from mako.lookup import TemplateLookup
 
 from datatypes.Datatype import Datatype
-from apollo.ApolloInstance import ApolloInstance
 from tracks.TrackStyles import TrackStyles
 from util import subtools
 from util import santitizer
 
 
 class TrackHub:
-    def __init__(self, inputFastaFile, apollo_user, outputFile, extra_files_path, tool_directory, trackType, apollo_host, user_email):
+    def __init__(self, inputFastaFile, outputFile, extra_files_path, tool_directory, trackType):
         
         self.rootAssemblyHub = None
 
@@ -36,9 +36,6 @@ class TrackHub:
         self.outputFile = outputFile
         self.chromSizesFile = None
 
-        # Set up apollo
-        self.apollo = ApolloInstance(apollo_host, tool_directory, user_email)
-        self.apollo_user = apollo_user
         
         # Set all the missing variables of this class, and create physically the folders/files
         self.rootAssemblyHub = self.__createAssemblyHub__(extra_files_path=extra_files_path)
@@ -77,7 +74,8 @@ class TrackHub:
         self._indexName()
         if not debug:
             self._removeRaw()
-        self._makeArchive()
+        #self._makeArchive()
+        self._outHtml()
         print "Success!\n"
 
 
@@ -116,27 +114,24 @@ class TrackHub:
         subtools.generate_names(self.mySpecieFolderPath)
         print "finished name index \n"
 
-    def _outHtml(self, host_name):
+    def _outHtml(self):
+        mylookup = TemplateLookup(directories=[os.path.join(self.tool_directory, 'templates')],
+                                  output_encoding='utf-8', encoding_errors='replace')
+        htmlTemplate = mylookup.get_template("display.txt")
+
         with open(self.outputFile, 'w') as htmlfile:
-            htmlstr = 'The new Organism "%s" is created on Apollo: <br>' % self.genome_name
-            jbrowse_hub = '<li><a href = "%s" target="_blank">View JBrowse Hub on Apollo</a></li>' % host_name
-            htmlstr += jbrowse_hub
-            htmlfile.write(htmlstr)     
+            htmlMakoRendered = htmlTemplate.render(
+            species_folder = os.path.relpath(self.mySpecieFolderPath, self.extra_files_path),
+            trackList = os.path.relpath(self.trackList, self.extra_files_path)
+        )
+            htmlfile.write(htmlMakoRendered)
+        #with open(self.outputFile, 'w') as htmlfile:
+        #    htmlstr = 'The new Organism "%s" is created on Apollo: <br>' % self.genome_name
+        #    jbrowse_hub = '<li><a href = "%s" target="_blank">View JBrowse Hub on Apollo</a></li>' % host_name
+        #    htmlstr += jbrowse_hub
+        #    htmlfile.write(htmlstr)   
+          
 
-    def _makeArchive(self):
-        jbrowse_hub_dir = self._getHubDir()
-        self.apollo.loadHubToApollo(self.apollo_user, self.genome_name, jbrowse_hub_dir, admin=True)
-        apollo_host = self.apollo.getHost()
-        self._outHtml(apollo_host)
-
-    def _getHubDir(self):
-        file_dir = os.path.abspath(self.outputFile)
-        source_dir = os.path.dirname(file_dir)
-        output_folder_name = os.path.basename(self.extra_files_path)
-        species_dir = os.path.relpath(self.mySpecieFolderPath, self.extra_files_path)
-        jbrowse_hub_dir = os.path.join(source_dir, output_folder_name, species_dir)
-        return jbrowse_hub_dir
-        
 
     def __createAssemblyHub__(self, extra_files_path):
         # Get all necessaries infos first

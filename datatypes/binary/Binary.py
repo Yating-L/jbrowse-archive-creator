@@ -10,7 +10,6 @@ import tempfile
 import collections
 import shutil
 import util
-from TrackDb import TrackDb
 from datatypes.Datatype import Datatype
 
 

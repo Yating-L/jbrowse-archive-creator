@@ -34,6 +34,7 @@ class TrackStyles(object):
             if not os.path.exists(cssFolderPath):
                 os.mkdir(cssFolderPath)
             os.mknod(cssFilePath)   
+            os.chmod(cssFilePath, 0o755)
         return cssFilePath
 
     def _getCssTemplate(self):

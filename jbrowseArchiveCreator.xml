@@ -1,14 +1,15 @@
-<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="1.0.1">
+<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.0.0">
     <description>
         This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse with Apollo plugin
     </description>
-
+    <macros>
+        <import>macros.xml</import>
+    </macros>
     <requirements>
         <requirement type="package" version="1.2">samtools</requirement>
         <requirement type="package" version="1.9">numpy</requirement>
         <requirement type="package" version="1.68">biopython</requirement>
         <requirement type="package" version="340">ucsc_hac</requirement>
-        <requirement type="package" version="3.0.3">apollo_api</requirement>
         <requirement type="package" version="1.12.1">jbrowse_tools</requirement>
     </requirements>
 
@@ -33,11 +34,6 @@ file_path = sys.argv[1]
 
 ## Ask the user to enter the genome name
 #silent $data_parameter_dict.update({"genome_name": str($genome_name)})
-#silent $data_parameter_dict.update({"apollo_host": str($apollo_host)})
-#if $apollo_users_settings.apollo_users_selector == "yes":
-    #set apollo_user = {"firstname": str($apollo_users_settings.firstname), "lastname": str($apollo_users_settings.lastname), "password": str($apollo_users_settings.password), "user_email": str($apollo_users_settings.user_email)}
-    $data_parameter_dict.update({"apollo_user": $apollo_user})
-#end if 
 
 ## Function to retrieve the data of the inputs
 #def prepare_json($datatype, $input_to_prepare, $order_index, $extra_data_dict={})
@@ -121,24 +117,22 @@ file_path = sys.argv[1]
             #end if
         #end if
         #if $f.formatChoice.format_select == "blastxml"
-                #silent $prepare_json($f.formatChoice.BlastXML, extra_data_dict)
+                #silent $prepare_json("BlastXml", $f.formatChoice.BlastXML, $index_track_final, 
+                                            extra_data_dict)
         #end if
         #if $f.formatChoice.format_select == "bigwig"
-            #set pos_color = str($f.formatChoice.pos_color)
-            #set neg_color = str($f.formatChoice.neg_color)
-            #silent $extra_data_dict.update({"style" : {"pos_color" : $pos_color, "neg_color" : $neg_color}})
             #silent $prepare_json("BigWig", $f.formatChoice.BIGWIG, $index_track_final,
                                             $extra_data_dict)
         #end if
         #if $f.formatChoice.format_select == 'gff3'
             #if $f.formatChoice.gff3Choice.gff3_select == 'gff3_generic'
-                #silent $prepare_json("Gff3", $f.formatChoice.GFF3, $index_track_final,
+                #silent $prepare_json("Gff3", $f.formatChoice.gff3Choice.GFF3_generic, $index_track_final,
                                             $extra_data_dict)
             #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_transcript'
-                #silent $prepare_json("Gff3_transcript", $f.formatChoice.GFF3, $index_track_final,
+                #silent $prepare_json("Gff3_transcript", $f.formatChoice.gff3Choice.GFF3_transcript, $index_track_final,
                                             $extra_data_dict)
             #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_mrna'
-                #silent $prepare_json("Gff3_mrna", $f.formatChoice.GFF3, $index_track_final,
+                #silent $prepare_json("Gff3_mrna", $f.formatChoice.gff3Choice.GFF3_mrna, $index_track_final,
                                             $extra_data_dict)
             #end if
         #end if
@@ -182,46 +176,6 @@ with open(file_path, 'w') as f:
                 type="data"
                 label="Reference genome"
         />
-        <param
-                name="apollo_host"
-                type="text"
-                label="Apollo host"
-        />
-        <conditional name="apollo_users_settings">
-            <param name="apollo_users_selector" type="select" label="Create or specify your Apollo account">
-                <option value="no" selected="true">Use exist demo user account (will use your galaxy email address for apollo, password: gonramp) </option>
-                <option value="yes">Create or use your own Apollo account</option>
-            </param>
-            <!-- TODO: Avoid redundancy here -->
-            <when value="yes">
-                <param
-                    name="firstname"
-                    type="text"
-                    label="First Name"
-                />
-                <param
-                    name="lastname"
-                    type="text"
-                    label="Last Name"
-                />
-                <param
-                    name="user_email"
-                    type="text"
-                    label="Email Address"
-                />
-                <param
-                    name="password"
-                    type="text"
-                    label="Password"
-                />
-            </when>
-            <when value="no">
-                <param name="default_user" type="hidden"
-                       value="false">
-                </param>
-            </when>
-        </conditional>
-        
         <repeat name="group" title="New group">
             <param type="text" name="group_name" label="Group name" value="Default group"/>
             <repeat name="format" title="New track">
@@ -375,7 +329,7 @@ with open(file_path, 'w') as f:
                             </when>
                         </conditional>
                         <param name="longLabel" type="text" size="30" value="Gene Prediction" label="Track name" />
-                        <param name="track_color" type="color" label="Track color" value="#daa520">
+                        <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>
                                 <valid initial="string.letters,string.digits">
                                     <add value="#"/>
@@ -430,13 +384,12 @@ with open(file_path, 'w') as f:
     </outputs>
     <tests>
         <test>
-            <param name="reference" value="dbia3/raw/dbia3.fa" />
-            <param name="genome_name" value="unknown" />
-            <param name="group_name" value="Default group"/>
-            <param name="format_select" value="bam" />
-            <param name="BAM" value="dbia3/raw/HISAT.bam" />
-            <param name="label" value="" />             
-            <output name="output" file="JBrowse_Archive_Creator_html.html" />
+            <param name="genome_name" value="Dbia3"/>
+            <param name="fasta_file" value="common/dbia3.fa"/>
+            <output name="output" file="only_genome/only_genome.html">
+                <!-- Use macro to check the whole common structure without repeated code -->
+                <expand macro="verify_hub_structure_no_track" test="only_genome" />
+            </output>
         </test>
     </tests>
     <help>

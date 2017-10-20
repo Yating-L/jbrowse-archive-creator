@@ -20,7 +20,6 @@ from datatypes.interval.BedBlatAlignments import BedBlatAlignments
 from datatypes.interval.BedBlastAlignments import BedBlastAlignments
 from datatypes.interval.Psl import Psl
 from datatypes.sequence.Fasta import Fasta
-from apollo.ApolloUser import ApolloUser
 from util import santitizer 
 
 class Reader(object):
@@ -74,39 +73,20 @@ class Reader(object):
         track_type = self.args.get("track_type")
         return track_type
     
-    def getApolloPath(self):
-        apollo_path = self.args.get("apollo_path")
-        return apollo_path
-    
-    def getApolloHost(self):
-        apollo_host = self.args.get("apollo_host")
-        return apollo_host
-        
+    def getGenomeName(self):
+        genome_name = santitizer.sanitize_name_input(self.args["genome_name"])
+        return genome_name
         
     def getRefGenome(self):
         array_inputs_reference_genome = self.args["fasta"]
         # TODO: Replace these with the object Fasta
         input_fasta_file = array_inputs_reference_genome["false_path"]
         input_fasta_file_name = santitizer.sanitize_name_input(array_inputs_reference_genome["name"])
-        genome_name = santitizer.sanitize_name_input(self.args["genome_name"])
+        #genome_name = santitizer.sanitize_name_input(self.args["genome_name"])
+        genome_name = self.getGenomeName()
         reference_genome = Fasta(input_fasta_file,
                              input_fasta_file_name, genome_name)
         return reference_genome
-
-    def getApolloUser(self):
-        user_info = self.args.get("apollo_user")
-        if not user_info:
-            firstname = "demo"
-            lastname = "user"
-            password = "gonramp"
-            user_email = self.getUserEmail()
-        else:
-            firstname = user_info['firstname']
-            lastname = user_info['lastname']
-            user_email = user_info['user_email']
-            password = user_info['password']
-        apollo_user = ApolloUser(user_email, firstname, lastname, password)
-        return apollo_user
 
     def getTracksData(self):
         self.logger = logging.getLogger(__name__)
