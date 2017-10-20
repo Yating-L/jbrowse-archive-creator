@@ -11,10 +11,7 @@ from datatypes.interval.BedSimpleRepeats import BedSimpleRepeats
 from datatypes.interval.BedSpliceJunctions import BedSpliceJunctions
 from datatypes.interval.BlastXml import BlastXml
 from datatypes.interval.Gff3 import Gff3
-from datatypes.interval.Gff3_mrna import Gff3_mrna
-from datatypes.interval.Gff3_transcript import Gff3_transcript
 from datatypes.interval.Gtf import Gtf
-from datatypes.interval.GtfStringTie import GtfStringTie
 from datatypes.interval.BigPsl import BigPsl
 from datatypes.interval.BedBlatAlignments import BedBlatAlignments
 from datatypes.interval.BedBlastAlignments import BedBlastAlignments
@@ -26,7 +23,7 @@ class Reader(object):
     
     DATATYPE_CLASS = [Bam, BigWig, Bed, BedSimpleRepeats, 
         BedSpliceJunctions, BigPsl, BedBlatAlignments, BedBlastAlignments, 
-        BlastXml, Gff3, Gff3_mrna, Gff3_transcript, Gff3_mrna, Gtf, GtfStringTie, Psl, Fasta]
+        BlastXml, Gff3, Gtf, Psl, Fasta]
 
     def __init__(self, input_json_file):
         self.inputFile = input_json_file

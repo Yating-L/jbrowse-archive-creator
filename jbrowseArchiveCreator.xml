@@ -92,7 +92,7 @@ file_path = sys.argv[1]
         #end if
         #if $f.formatChoice.format_select == "bed"
             #if $f.formatChoice.bedChoice.bed_select == "bed_generic"
-                #silent $prepare_json("Bed", $f.formatChoice.bedChoice.BED, $index_track_final,
+                #silent $prepare_json("Bed", $f.formatChoice.bedChoice.BED_generic, $index_track_final,
                                                 $extra_data_dict)
             #end if
             #if $f.formatChoice.bedChoice.bed_select == "bed_simple_repeats_option"
@@ -125,16 +125,8 @@ file_path = sys.argv[1]
                                             $extra_data_dict)
         #end if
         #if $f.formatChoice.format_select == 'gff3'
-            #if $f.formatChoice.gff3Choice.gff3_select == 'gff3_generic'
-                #silent $prepare_json("Gff3", $f.formatChoice.gff3Choice.GFF3_generic, $index_track_final,
+            #silent $prepare_json("Gff3", $f.formatChoice.GFF3, $index_track_final,
                                             $extra_data_dict)
-            #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_transcript'
-                #silent $prepare_json("Gff3_transcript", $f.formatChoice.gff3Choice.GFF3_transcript, $index_track_final,
-                                            $extra_data_dict)
-            #elif $f.formatChoice.gff3Choice.gff3_select == 'gff3_mrna'
-                #silent $prepare_json("Gff3_mrna", $f.formatChoice.gff3Choice.GFF3_mrna, $index_track_final,
-                                            $extra_data_dict)
-            #end if
         #end if
         #if $f.formatChoice.format_select == "gtf"
             ## Add also GTF from Agustus? See https://github.com/ENCODE-DCC/kentUtils/issues/8
@@ -297,37 +289,12 @@ with open(file_path, 'w') as f:
                         </param>
                     </when>
                     <when value="gff3">
-                        <conditional name="gff3Choice">
-                            <param name="gff3_select" type="select" label="gff3 type">
-                                <option value="gff3_generic">GFF3 format</option>
-                                <option value="gff3_transcript">GFF3 format output from gene prediction tools (e.g. Augustus), structure: gene->transcription->CDS</option>
-                                <option value="gff3_mrna">GFF3 format output from gene prediction tools (e.g. SNAP), structure: gene->mRNA->CDS</option>
-                            </param>
-                            <when value="gff3_generic">
-                                <param
-                                        format="gff3"
-                                        name="GFF3_generic"
-                                        type="data"
-                                        label="GFF3 File"
-                                />
-                            </when>
-                            <when value="gff3_transcript">
-                                <param
-                                        format="gff3"
-                                        name="GFF3_transcript"
-                                        type="data"
-                                        label="GFF3 File from gene prediction"
-                                />
-                            </when>
-                            <when value="gff3_mrna">
-                                <param
-                                        format="gff3"
-                                        name="GFF3_mrna"
-                                        type="data"
-                                        label="GFF3 File from gene prediction"
-                                />
-                            </when>
-                        </conditional>
+                        <param
+                            format="gff3"
+                            name="GFF3"
+                            type="data"
+                            label="GFF3 File"
+                        />
                         <param name="longLabel" type="text" size="30" value="Gene Prediction" label="Track name" />
                         <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>

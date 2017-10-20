@@ -5,6 +5,7 @@ import tempfile
 import abc
 import shutil
 
+
 # Internal dependencies
 from Interval import Interval
 from datatypes.validators.DataValidation import DataValidation
@@ -18,4 +19,7 @@ class Gff(Interval):
     
     def createTrack(self):
         shutil.copyfile(self.inputFile, self.trackDataURL)
+
+    
+            
     

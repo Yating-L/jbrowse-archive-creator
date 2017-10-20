@@ -20,6 +20,7 @@ class Gtf(Gff):
     def initSettings(self):
         super(Gtf, self).initSettings()
         self.extraSettings["glyph"] = "JBrowse/View/FeatureGlyph/Segments"
+        self.extraSettings["subfeatureClasses"] = "UTR"
 
     def createTrack(self):
         self.convertType = self.getConvertType()
