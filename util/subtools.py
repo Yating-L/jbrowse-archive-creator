@@ -229,7 +229,7 @@ def createBamIndex(bamfile):
     else:
         raise ValueError('Did not find bai file')
 
-def flatfile_to_json(inputFile, dataType, trackType, trackLabel, outputFolder, options=None, compress=False):
+def flatfile_to_json(inputFile, dataType, trackType, trackLabel, outputFolder, options=None, compress=True):
     if "bed" in dataType:
         fileType = "--bed"
     elif "gff" in dataType:
