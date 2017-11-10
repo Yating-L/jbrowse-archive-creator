@@ -1,0 +1,368 @@
+<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.0.0">
+    <description>
+        This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse with Apollo plugin
+    </description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+    <requirements>
+        <requirement type="package" version="1.2">samtools</requirement>
+        <requirement type="package" version="1.9">numpy</requirement>
+        <requirement type="package" version="1.68">biopython</requirement>
+        <requirement type="package" version="340">ucsc_hac</requirement>
+        <requirement type="package" version="1.12.1">jbrowse_tools</requirement>
+    </requirements>
+
+    <stdio>
+    </stdio>
+
+    <command detect_errors="exit_code"><![CDATA[
+        mkdir -p $output.extra_files_path;
+        
+        ## Dump the tool parameters into a JSON file 
+        python $json_file parameters.json;
+
+        python $__tool_directory__/jbrowseArchiveCreator.py --data_json parameters.json -o $output
+    ]]></command>
+    <configfiles>
+        <configfile name="json_file">
+import json
+import sys
+
+file_path = sys.argv[1]
+#set global data_parameter_dict = {}
+
+## Ask the user to enter the genome name
+#silent $data_parameter_dict.update({"genome_name": str($genome_name)})
+
+## Function to retrieve the data of the inputs
+#def prepare_json($datatype, $input_to_prepare, $order_index, $extra_data_dict={})
+    #set false_path = str($input_to_prepare)
+    #set $data_dict = {"false_path": $false_path}
+
+    #set name = str($input_to_prepare.name)
+    #silent $data_dict.update({"name": $name})
+    #silent $data_dict.update($extra_data_dict)
+    ## Add the ordering by taking the tool form indexes
+    #silent $data_dict.update({"order_index": $order_index})
+
+    #if $datatype in $data_parameter_dict
+        #silent $data_parameter_dict[$datatype].append($data_dict)
+    #else
+        #set array_inputs = []
+        #silent $array_inputs.append($data_dict)
+        #silent $data_parameter_dict.update({$datatype: $array_inputs})
+    #end if 
+#end def
+
+## Get the number of digits from tracks, to have a unique integer from group index and track index
+
+#set temp_max_digit = 0
+
+#for $g in $group
+    #if len($g.format) > $temp_max_digit
+        #silent temp_max_digit = len($g.format)
+    #end if
+#end for
+
+#set nb_digits_max_track = len(str($temp_max_digit))
+
+## END Get the number of digits
+
+#for $i_g, $g in enumerate( $group )
+    #for $i, $f in enumerate( $g.format )
+        ## Create the order index using index_group+1 concatenated with index_track
+        #set index_group_final = str($i_g + 1)
+        #set index_track_final = str($index_group_final) + str($i).zfill($nb_digits_max_track)
+
+        ## For each format, we have a few mandatory fields we store in a dict
+        #set track_color = str($f.formatChoice.track_color)
+        #set group_name = str($g.group_name)
+        #set longLabel = str($f.formatChoice.longLabel)
+        #set extra_data_dict = {"track_color": $track_color,
+                                "group_name": $group_name,
+                                "long_label": $longLabel}
+        #if $f.formatChoice.format_select == "bam"
+            #set bam_index = $f.formatChoice.BAM.metadata.bam_index
+
+            ## Add Bam format specific fields
+            #silent $extra_data_dict.update({"index": $bam_index})
+
+            #silent $prepare_json("Bam", $f.formatChoice.BAM, $index_track_final, $extra_data_dict)
+        #end if
+        #if $f.formatChoice.format_select == "bed"
+            #if $f.formatChoice.bedChoice.bed_select == "bed_generic"
+                #silent $prepare_json("Bed", $f.formatChoice.bedChoice.BED_generic, $index_track_final,
+                                                $extra_data_dict)
+            #end if
+            #if $f.formatChoice.bedChoice.bed_select == "bed_simple_repeats_option"
+                #silent $prepare_json("BedSimpleRepeats", $f.formatChoice.bedChoice.BED_simple_repeats, $index_track_final,
+                                                $extra_data_dict)
+            #end if
+            #if $f.formatChoice.bedChoice.bed_select == "bed_splice_junctions_option"
+                #silent $prepare_json("BedSpliceJunctions", $f.formatChoice.bedChoice.BED_splice_junctions, $index_track_final,
+                                                $extra_data_dict)
+            #end if
+            #if $f.formatChoice.bedChoice.bed_select == "bed_blast_alignment_option"
+                ##set database = str($f.formatChoice.bedChoice.database)
+                ##silent $extra_data_dict.update({"database": $database})
+                #silent $prepare_json("BedBlastAlignments", $f.formatChoice.bedChoice.BED_blast_alignment, $index_track_final,
+                                             $extra_data_dict)
+            #end if
+            #if $f.formatChoice.bedChoice.bed_select == "bed_blat_alignment_option"
+                ##set database = str($f.formatChoice.bedChoice.database)
+                ##silent $extra_data_dict.update({"database": $database})
+                #silent $prepare_json("BedBlatAlignments", $f.formatChoice.bedChoice.BED_blat_alignment, $index_track_final,
+                                             $extra_data_dict)
+            #end if
+        #end if
+        #if $f.formatChoice.format_select == "blastxml"
+                #silent $prepare_json("BlastXml", $f.formatChoice.BlastXML, $index_track_final, 
+                                            extra_data_dict)
+        #end if
+        #if $f.formatChoice.format_select == "bigwig"
+            #silent $prepare_json("BigWig", $f.formatChoice.BIGWIG, $index_track_final,
+                                            $extra_data_dict)
+        #end if
+        #if $f.formatChoice.format_select == 'gff3'
+            #silent $prepare_json("Gff3", $f.formatChoice.GFF3, $index_track_final,
+                                            $extra_data_dict)
+        #end if
+        #if $f.formatChoice.format_select == "gtf"
+            ## Add also GTF from Agustus? See https://github.com/ENCODE-DCC/kentUtils/issues/8
+            #silent $prepare_json("Gtf", $f.formatChoice.GTF, $index_track_final,
+                                             $extra_data_dict)
+        #end if
+    #end for
+#end for
+
+## We combine the fasta file dataset name with his false path in a JSON object
+#set fasta_json = {"false_path": str($fasta_file), "name": str($fasta_file.name)}
+$data_parameter_dict.update({"fasta": $fasta_json})
+
+## Retrieve the user email
+#silent $data_parameter_dict.update({"user_email": str($__user_email__)})
+
+#silent $data_parameter_dict.update({"tool_directory": str($__tool_directory__)})
+
+#silent $data_parameter_dict.update({"extra_files_path": str($output.extra_files_path)})
+
+#silent $data_parameter_dict.update({"debug_mode": str($advanced_options.debug_mode)})
+
+with open(file_path, 'w') as f:
+    json.dump($data_parameter_dict, f)
+        </configfile>
+    </configfiles>
+
+    <inputs>
+        <param
+                name="genome_name"
+                type="text"
+                size="30"
+                value="unknown"
+                label="JBrowse Hub Name"
+        />
+        <param
+                format="fasta"
+                name="fasta_file"
+                type="data"
+                label="Reference genome"
+        />
+        <repeat name="group" title="New group">
+            <param type="text" name="group_name" label="Group name" value="Default group"/>
+            <repeat name="format" title="New track">
+                <conditional name="formatChoice">
+                    <param name="format_select" type="select" label="Format">
+                        <option value="bam" selected="true">BAM</option>
+                        <option value="bed">BED</option>
+                        <option value="blastxml">BlastXML</option>
+                        <option value="bigwig">BigWig</option>
+                        <option value="gff3">GFF3</option>
+                        <option value="gtf">GTF</option>
+                    </param>
+
+                    <when value="bam">
+                        <param
+                                format="bam"
+                                name="BAM"
+                                type="data"
+                                label="BAM File"
+                        />
+                        <param name="longLabel" type="text" size="30" value = "Sequence Alignment" label="Track label" />
+                        <param name="track_color" type="color" label="Track color" value="#000000">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
+                    </when>     
+                    <when value="bed">
+                        <conditional name="bedChoice">
+                            <param name="bed_select" type="select" label="Bed Choice">
+                                <option value="bed_generic">BED format</option>
+                                <option value="bed_simple_repeats_option">BED Simple repeat (bed4+12 / simpleRepeat.as)</option>
+                                <option value="bed_splice_junctions_option">BED Splice junctions (bed12+1 / spliceJunctions.as)</option>
+                                <option value="bed_blast_alignment_option">Blast alignments (bed12+12 / bigPsl.as)</option>
+                                <option value="bed_blat_alignment_option">BLAT alignments (bigPsl / bigPsl.as)</option>
+                            </param>
+                            <when value="bed_generic">
+                                <param
+                                        format="bed"
+                                        name="BED_generic"
+                                        type="data"
+                                        label="Bed File"
+                                />
+                            </when>
+                            <when value="bed_simple_repeats_option">
+                                <param
+                                        format="bed"
+                                        name="BED_simple_repeats"
+                                        type="data"
+                                        label="Bed Simple Repeats (Bed4+12) File"
+                                />
+                            </when>
+                            <when value="bed_splice_junctions_option">
+                                <param
+                                        format="bed"
+                                        name="BED_splice_junctions"
+                                        type="data"
+                                        label="Bed Splice Junctions (Bed12+1) File"
+                                />
+                            </when>
+                            <when value="bed_blast_alignment_option">
+                                <param
+                                        format="bed"
+                                        name="BED_blast_alignment"
+                                        type="data"
+                                        label="Bed Blast Alignments (Bed12+12) File"
+                                />
+                            </when>
+                            <when value="bed_blat_alignment_option">
+                                <param
+                                        format="bed"
+                                        name="BED_blat_alignment"
+                                        type="data"
+                                        label="Bed BLAT Alignments (bigPsl) File"
+                                />
+                            </when>
+                        </conditional>
+                        <param name="longLabel" type="text" size="30" label="Track label" />
+                        <param name="track_color" type="color" label="Track color" value="#000000">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
+                    </when>
+                    <when value="blastxml">
+                        <param
+                                format="blastxml"
+                                name="BlastXML"
+                                type="data"
+                                label="Blast Alignments File"
+                        />
+                        <param name="longLabel" type="text" size="30" value="Blast Alignment" label="Track label" />
+                        <param name="track_color" type="color" label="Track color" value="#000000">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
+                    </when>
+                    <when value="bigwig">
+                        <param
+                                format="bigwig"
+                                name="BIGWIG"
+                                type="data"
+                                label="BIGWIG File"
+                        />
+                        <param name="longLabel" type="text" size="30" value="Sequence Coverage" label="Track label" />
+                        <param name="track_color" type="color" label="Track color" value="#000000">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
+                    </when>
+                    <when value="gff3">
+                        <param
+                            format="gff3"
+                            name="GFF3"
+                            type="data"
+                            label="GFF3 File"
+                        />
+                        <param name="longLabel" type="text" size="30" value="Gene Prediction" label="Track name" />
+                        <param name="track_color" type="color" label="Track color" value="#000000">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
+                    </when>
+                    <when value="gtf">
+                        <param
+                                format="gtf"
+                                name="GTF"
+                                type="data"
+                                label="GTF File"
+                        />
+                        <param name="longLabel" type="text" size="30" value="Assembled Transcripts" label="Track name" />
+                        <param name="track_color" type="color" label="Track color" value="#000000">
+                            <sanitizer>
+                                <valid initial="string.letters,string.digits">
+                                    <add value="#"/>
+                                </valid>
+                            </sanitizer>
+                        </param>
+                    </when>  
+                </conditional>
+            </repeat>
+        </repeat>
+        <conditional name="advanced_options">
+            <param name="advanced_options_selector" type="select" label="Advanced options">
+                <option value="off" selected="true">Hide advanced options</option>
+                <option value="on">Display advanced options</option>
+            </param>
+            <!-- TODO: Avoid redundancy here -->
+            <when value="on">
+                <param name="debug_mode" type="select" label="Activate debug mode"> 
+                    <option value="false" selected="true">No</option>
+                    <option value="true">Yes</option>
+                    <help>
+                        Use this option if you are a G-OnRamp developer
+                    </help>
+                </param>
+            </when>
+            <when value="off">
+                <param name="debug_mode" type="hidden"
+                       value="false">
+                </param>
+            </when>
+        </conditional>
+    </inputs>
+
+    <outputs>
+        <data format="jbrowsehub" name="output" label="${tool.name}" />
+    </outputs>
+    <tests>
+        <test>
+            <param name="genome_name" value="Dbia3"/>
+            <param name="fasta_file" value="common/dbia3.fa"/>
+            <output name="output" file="only_genome/only_genome.html">
+                <!-- Use macro to check the whole common structure without repeated code -->
+                <expand macro="verify_hub_structure_no_track" test="only_genome" />
+            </output>
+        </test>
+    </tests>
+    <help>
+        This Galaxy tool will create a jbrowse hub which including binary datasets and json datasets that can be used for
+        JBrowse visualization.
+    </help>
+    <citations>
+    </citations>
+</tool>

@@ -1,0 +1,9 @@
+.${label},
+.plus-${label},
+.minus-${label}
+{
+    background-color: ${color};
+    height: 90%;
+    top: 5%;
+}
+

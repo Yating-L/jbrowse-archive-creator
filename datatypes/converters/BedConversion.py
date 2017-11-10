@@ -5,30 +5,45 @@ Convert BED format to gff3
 reference for gff3: https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md
 '''
 import os
+import tempfile
 from collections import OrderedDict
-import utils
 
-class bedToGff3():
-    def __init__(self, inputBedFile, chrom_sizes, bed_type, output):
-        self.input = inputBedFile
-        #file_dir = os.path.basename(inputBedFile)
-        #print file_dir + "\n\n"
-        self.output = output
-        self.chrom_sizes = chrom_sizes
-        self.type = bed_type
-        if self.type == "trfbig":
+from util import subtools 
+from DataConversion import DataConversion
+
+class BedConversion(DataConversion):
+    def __init__(self, inputBedFile, outputFile, chromSizesFile, bedType, trackType, options=None):
+       super(BedConversion, self).__init__(inputBedFile, outputFile, chromSizesFile, bedType, options)
+        
+    
+    def convertFormats(self):
+        self.dataToJson()
+
+    
+    def dataToJson(self):
+        if self.dataType != 'bed':
+            self.convertToGff3()
+            self.inputFile = self.gff3_file
+            self.dataType == 'gff'
+        subtools.flatfile_to_json(self.inputFile, self.dataType, self.trackType, self.trackLabel, self.outputFile, self.options)
+        
+    def convertToGff3(self):
+        self.gff3_file = tempfile.NamedTemporaryFile(suffix=".gff3")
+        if self.dataType == "trfbig":
             self.trfbig_to_gff3()
-        if self.type == "regtools":
+        elif self.dataType == "regtools":
             self.splicejunctions_to_gff3()
-        if self.type == "blat":
+        elif self.dataType == "blat":
             self.bigpsl_to_gff3()
+        else:
+            raise ValueError("dataType %s is not support for converting to GFF3", self.dataType)
 
     def trfbig_to_gff3(self):
-        gff3 = open(self.output, 'w')
+        gff3 = open(self.gff3_file.name, 'w')
         gff3.write("##gff-version 3\n")
-        sizes_dict = utils.sequence_region(self.chrom_sizes)
+        sizes_dict = subtools.sequence_region(self.chromSizesFile)
         seq_regions = dict()
-        with open(self.input, 'r') as bed:
+        with open(self.inputFile, 'r') as bed:
             for line in bed:
                 field = OrderedDict()
                 attribute = OrderedDict()
@@ -57,16 +72,16 @@ class bedToGff3():
                 attribute['percent of t\'s in repeat unit'] = li[13]
                 attribute['entropy'] = li[14]
                 attribute['sequence of repeat unit element'] = li[15]
-                utils.write_features(field, attribute, gff3)
+                subtools.write_features(field, attribute, gff3)
         gff3.close()
 
 
     def splicejunctions_to_gff3(self):
-        gff3 = open(self.output, 'w')
+        gff3 = open(self.gff3_file.name, 'w')
         gff3.write("##gff-version 3\n")
-        sizes_dict = utils.sequence_region(self.chrom_sizes)
+        sizes_dict = subtools.sequence_region(self.chromSizesFile)
         seq_regions = dict()
-        with open(self.input, 'r') as bed:
+        with open(self.inputFile, 'r') as bed:
             for line in bed:
                 field = OrderedDict()
                 attribute = OrderedDict()
@@ -89,16 +104,16 @@ class bedToGff3():
                 attribute['blockcount'] = li[9]
                 attribute['blocksizes'] = li[10]
                 attribute['chromstarts'] = li[11]
-                utils.write_features(field, attribute, gff3)
-                utils.child_blocks(field, attribute, gff3, 'exon_junction')
+                subtools.write_features(field, attribute, gff3)
+                subtools.child_blocks(field, attribute, gff3, 'exon_junction')
         gff3.close()
 
     def bigpsl_to_gff3(self):
-        gff3 = open(self.output, 'w')
+        gff3 = open(self.gff3_file.name, 'w')
         gff3.write("##gff-version 3\n")
-        sizes_dict = utils.sequence_region(self.chrom_sizes)
+        sizes_dict = subtools.sequence_region(self.chromSizesFile)
         seq_regions = dict()
-        with open(self.input, 'r') as bed:
+        with open(self.inputFile, 'r') as bed:
             for line in bed:
                 field = OrderedDict()
                 attribute = OrderedDict()
@@ -133,7 +148,7 @@ class bedToGff3():
                 attribute['number of bases that don\'t match'] = li[21]
                 attribute['number of bases that match but are part of repeats'] = li[22]
                 attribute['number of \'N\' bases'] = li[23]
-                utils.write_features(field, attribute, gff3)
-                utils.child_blocks(field, attribute, gff3, 'match_part')
+                subtools.write_features(field, attribute, gff3)
+                subtools.child_blocks(field, attribute, gff3, 'match_part')
         gff3.close()
-        
+

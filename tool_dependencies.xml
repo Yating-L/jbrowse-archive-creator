@@ -4,6 +4,10 @@
         <repository name="package_samtools_1_2" owner="iuc" prior_installation_required="True"/>
     </package>
 
+    <package name="ucsc_hac" version="340">
+        <repository name="package_ucsc_hac_340" owner="yating-l" />
+    </package>
+
     <package name="numpy" version="1.9">
         <repository name="package_numpy_1_9" owner="iuc" prior_installation_required="True" />
     </package>
@@ -47,33 +51,13 @@ The PYTHONPATH for biopython can be accessed through PYTHONPATH_BIOPYTHON.
             </actions>
         </install>
     </package>
-    
-     <package name="ucsc_tools_340" version="1.0">
-        <install version="1.0">
-            <actions_group>
-                <actions architecture="x86_64" os="linux">
-                    <action type="download_by_url">http://old-gep.wustl.edu/~galaxy/ucsc_tools_340.tar.gz</action>
-                    <action type="move_directory_files">
-                        <source_directory>.</source_directory>                       
-                        <destination_directory>$INSTALL_DIR/bin</destination_directory>
-                    </action>    
-                </actions>
-                <action type="set_environment">
-                    <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/bin</environment_variable>
-                </action>
-            </actions_group>
-         </install>
-         <readme>The well known UCSC tools from Jim Kent.</readme>
-    </package>
+
     <package name="jbrowse_tools" version="1.12.1">
         <install version="1.0">
             <actions_group>
                 <actions architecture="x86_64" os="linux">
                     <action type="download_by_url">http://jbrowse.org/wordpress/wp-content/plugins/download-monitor/download.php?id=105</action>
                     <action type="make_directory">$INSTALL_DIR/jbrowse</action>
-                    <action type="set_environment">
-                        <environment_variable action="set_to" name="HOME">$INSTALL_DIR/jbrowse</environment_variable>
-                    </action>
                     <action type="shell_command">
                         export HOME=$INSTALL_DIR/jbrowse &amp;&amp; ./setup.sh
                     </action>
@@ -93,5 +77,4 @@ The PYTHONPATH for biopython can be accessed through PYTHONPATH_BIOPYTHON.
          <readme>The perl scripts for converting flat files to json.</readme>
     </package>
 
-    
 </tool_dependency>
