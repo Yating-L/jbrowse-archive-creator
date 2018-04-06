@@ -59,7 +59,7 @@ class Datatype(object):
 
         # TODO: All this should be in TrackHub and not in Datatype
         Datatype.mySpecieFolderPath = specie_folder
-        Datatype.myTrackFolderPath = tracks_folder
+        Datatype.myTrackFolderPath = tracks_folder  # temporary raw data files
         Datatype.myBinaryFolderPath = binary_folder
 
         Datatype.input_fasta_file = reference_genome

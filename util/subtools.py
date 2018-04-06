@@ -9,7 +9,7 @@ import subprocess
 import os
 import sys
 import tempfile
-import string
+import shutil
 import logging
 
 class PopenError(Exception):
@@ -228,6 +228,60 @@ def createBamIndex(bamfile):
         return filename
     else:
         raise ValueError('Did not find bai file')
+
+def createFastaIndex(fastaFile):
+    subprocess.call(['samtools', 'faidx', fastaFile])
+    filename = fastaFile + '.fai'
+    if os.path.exists(filename):
+        return filename
+    else:
+        raise ValueError('Did not find fai file')
+
+def gff3sort(inputFile, outputFile, precise=False):
+    array_call = ['gff3sort.pl', inputFile]
+    if precise:
+        array_call.append('--precise')
+    p = _handleExceptionAndCheckCall(array_call, stdout=outputFile)
+    return p
+
+def bedSort(inputFile, outputFile):
+    array_call = ['sort', '-k1,1', '-k2,2n', '-k6,6', inputFile]
+    p = _handleExceptionAndCheckCall(array_call, stdout=outputFile)
+    return p
+
+def bgzip(inputFile):
+    subprocess.call(['bgzip', inputFile])
+    filename = inputFile + '.gz'
+    if os.path.exists(filename):
+        return filename
+    else:
+        raise ValueError('Did not find gz file')
+
+def createTabix(inputFile, dataType):
+    subprocess.call(['tabix', '-p', dataType, inputFile])
+    filename = inputFile + '.tbi'
+    if os.path.exists(filename):
+        return filename
+    else:
+        raise ValueError('Did not find tbi file')
+
+def generate_tabix_indexed_track(inputFile, dataType, trackName, outputFolder):
+    if "bed" in dataType:
+        fileType = 'bed'
+        sortedFile = tempfile.NamedTemporaryFile(bufsize=0)
+        bedSort(inputFile, sortedFile)
+    elif "gff" in dataType:
+        fileType = 'gff'
+        sortedFile = tempfile.NamedTemporaryFile(bufsize=0)
+        gff3sort(inputFile, sortedFile)
+    compressedFile = bgzip(sortedFile.name)
+    tabixFile = createTabix(compressedFile, fileType)
+    trackPath = os.path.join(outputFolder, trackName)
+    trackIndexPath = os.path.join(outputFolder, trackName+'.tbi')
+    logging.debug("copying track file %s to trackPath %s", (trackName, trackPath))
+    shutil.copy(compressedFile, trackPath)
+    logging.debug("copying track tabix file %s to trackIndexPath %s", (trackName+'.tbi', trackIndexPath))
+    shutil.copy(tabixFile, trackIndexPath)
 
 def flatfile_to_json(inputFile, dataType, trackType, trackLabel, outputFolder, options=None, compress=True):
     if "bed" in dataType:

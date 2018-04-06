@@ -25,6 +25,9 @@ class TrackHub:
         # Store intermediate files, will be removed if not in debug mode
         self.myTracksFolderPath = None
 
+        # Store interval files and their tabix index
+        self.myFinalTracksFolderPath = None
+
         # Store binary files: Bam, BigWig
         self.myBinaryFolderPath = None
 
@@ -42,7 +45,7 @@ class TrackHub:
         # Init the Datatype 
         Datatype.pre_init(self.reference_genome, self.chromSizesFile,
                           self.extra_files_path, self.tool_directory,
-                          self.mySpecieFolderPath, self.myTracksFolderPath, self.myBinaryFolderPath, self.trackType)  
+                          self.mySpecieFolderPath, self.myTracksFolderPath, self.myBinaryFolderPath, self.trackType)
 
         self._prepareRefseq()
         self.trackList = os.path.join(self.mySpecieFolderPath, "trackList.json")
@@ -66,8 +69,12 @@ class TrackHub:
         else: 
             if trackDbObject['trackType'] == 'HTMLFeatures':
                 self._customizeHTMLFeature(trackDbObject)
-            subtools.flatfile_to_json(trackDbObject['trackDataURL'], trackDbObject['dataType'], trackDbObject['trackType'], trackDbObject['trackLabel'], self.mySpecieFolderPath, trackDbObject['options'])
-
+                subtools.flatfile_to_json(trackDbObject['trackDataURL'], trackDbObject['dataType'], trackDbObject['trackType'], trackDbObject['trackLabel'], self.mySpecieFolderPath, trackDbObject['options'])
+            # Use Tabix index tracks by default for CanvasFeatures
+            # TODO: add support for HTMLFeatures
+            else:
+                subtools.generate_tabix_indexed_track(trackDbObject['trackDataURL'], trackDbObject['dataType'], trackDbObject['track'], self.myFinalTracksFolderPath)
+                subtools.add_track_json(self.trackList, trackDbObject['options'])
 
     def terminate(self, debug=False):
         """ Write html file """
@@ -163,22 +170,22 @@ class TrackHub:
             os.makedirs(myHubPath)
 
         # Create the specie folder
-        # TODO: Generate the name depending on the specie
         mySpecieFolderPath = os.path.join(myHubPath, self.genome_name)
         if not os.path.exists(mySpecieFolderPath):
             os.makedirs(mySpecieFolderPath)
         self.mySpecieFolderPath = mySpecieFolderPath
 
-        # We create the 2bit file while we just created the specie folder
-        #self.twoBitName = self.genome_name + ".2bit"
-        #self.two_bit_final_path = os.path.join(self.mySpecieFolderPath, self.twoBitName)
-        #shutil.copyfile(twoBitFile.name, self.two_bit_final_path)
-
-        # Create the folder tracks into the specie folder
+        # Create the folder named 'raw' inside the specie folder to place raw files
         tracksFolderPath = os.path.join(mySpecieFolderPath, "raw")
         if not os.path.exists(tracksFolderPath):
             os.makedirs(tracksFolderPath)
         self.myTracksFolderPath = tracksFolderPath
+
+        # Create the folder tracks into the specie folder
+        finalTracksFolderPath = os.path.join(mySpecieFolderPath, "tracks")
+        if not os.path.exists(finalTracksFolderPath):
+            os.makedirs(finalTracksFolderPath)
+        self.myFinalTracksFolderPath = finalTracksFolderPath
 
         myBinaryFolderPath = os.path.join(mySpecieFolderPath, 'bbi')
         if not os.path.exists(myBinaryFolderPath):
