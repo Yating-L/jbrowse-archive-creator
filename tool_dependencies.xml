@@ -77,4 +77,23 @@ The PYTHONPATH for biopython can be accessed through PYTHONPATH_BIOPYTHON.
          <readme>The perl scripts for converting flat files to json.</readme>
     </package>
 
+    <package name="gff3sort" version="1.0">
+        <install version="1.0">
+            <actions_group>
+                <actions architecture="x86_64" os="linux">
+                <action type="download_by_url">https://github.com/billzt/gff3sort/archive/v0.1-alpha.zip</action>
+                    <action type="make_directory">$INSTALL_DIR/gff3sort</action>
+                    <action type="move_directory_files">
+                        <source_directory>.</source_directory>
+                        <destination_directory>$INSTALL_DIR/gff3sort</destination_directory>
+                    </action>
+                    <action type="set_environment">
+                        <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/gff3sort</environment_variable>
+                    </action>
+                </actions>
+            </actions_group>
+        </install>
+    <readme>A Perl Script to sort gff3 files and produce suitable results for tabix tools. </readme>
+    </package>
+
 </tool_dependency>
