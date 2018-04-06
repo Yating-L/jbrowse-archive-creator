@@ -237,6 +237,21 @@ def createFastaIndex(fastaFile):
     else:
         raise ValueError('Did not find fai file')
 
+def remove_gene_lines(gff3_file, gff3_filtered):
+    with open(gff3_file, 'r') as f:
+        with open(gff3_filtered, 'w') as out:
+            for line in f:
+                if not line.startswith('#'):
+                    feature_type = line.split('\t')[2].rstrip()
+                    if feature_type == 'transcript' or feature_type == 'mRNA':
+                        arr = line.split('\t')
+                        # as we remove the gene features, we should also remove the Parent attribute (gene id) from the transcript
+                        arr[8] = ';'.join([item for item in arr[8].split(';') if 'Parent=' not in item]).rstrip()
+                        line = '\t'.join(arr) + '\n'
+                    if feature_type == 'gene':
+                        continue
+                out.write(line)
+
 def gff3sort(inputFile, outputFile, precise=False):
     array_call = ['gff3sort.pl', inputFile]
     if precise:
@@ -272,8 +287,10 @@ def generate_tabix_indexed_track(inputFile, dataType, trackName, outputFolder):
         bedSort(inputFile, sortedFile)
     elif "gff" in dataType:
         fileType = 'gff'
+        filteredFile = tempfile.NamedTemporaryFile(bufsize=0)
+        remove_gene_lines(inputFile, filteredFile.name)
         sortedFile = tempfile.NamedTemporaryFile(bufsize=0)
-        gff3sort(inputFile, sortedFile)
+        gff3sort(filteredFile.name, sortedFile)
     compressedFile = bgzip(sortedFile.name)
     tabixFile = createTabix(compressedFile, fileType)
     trackPath = os.path.join(outputFolder, trackName)
