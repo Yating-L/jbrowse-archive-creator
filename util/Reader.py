@@ -69,8 +69,11 @@ class Reader(object):
             exit(1)
 
     def getTrackType(self):
-        track_type = self.args.get("track_type")
-        return track_type
+        try:
+            return self.args.get("feature_tracks_type")
+        except KeyError:
+            print ("feature tracks type is not defined in the input file!")
+            exit(1)
     
     def getGenomeName(self):
         genome_name = santitizer.sanitize_name_input(self.args["genome_name"])

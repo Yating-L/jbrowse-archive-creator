@@ -50,20 +50,15 @@ class TrackHub:
         self._prepareRefseq()
         self.trackList = os.path.join(self.mySpecieFolderPath, "trackList.json")
         self._createTrackList()
-        
-        self.myTrackStyle = TrackStyles(self.tool_directory, self.mySpecieFolderPath, self.trackList)
-        #self.cssFolderPath = os.path.join(self.mySpecieFolderPath, 'css')
-        #self.cssFilePath = os.path.join(self.cssFolderPath, 'custom_track_styles.css')
+        if Datatype.trackType == 'HTMLFeatures':
+            self.myTrackStyle = TrackStyles(self.tool_directory, self.mySpecieFolderPath, self.trackList)
         self.logger = logging.getLogger(__name__)
 
     
 
     def addTrack(self, trackDbObject):
         if trackDbObject['dataType'].lower() == 'bam':
-            #new_track = subprocess.Popen(['echo', trackDbObject['options']], stdout=subprocess.PIPE)
-            #subprocess.call(['add-track-json.pl', json_file], stdin=new_track.stdout)
             subtools.add_track_json(self.trackList, trackDbObject['options'])
-            #subtools.add_track_json(self.trackList, trackDbObject['track_json'])
         elif trackDbObject['dataType'].lower() == 'bigwig':
             subtools.add_track_json(self.trackList, trackDbObject['options'])
         else: 
@@ -81,7 +76,6 @@ class TrackHub:
         self._indexName()
         if not debug:
             self._removeRaw()
-        #self._makeArchive()
         self._outHtml()
         print "Success!\n"
 
@@ -112,7 +106,6 @@ class TrackHub:
         subtools.prepare_refseqs(self.reference_genome.false_path, self.mySpecieFolderPath)
 
     def _indexName(self):
-        #subprocess.call(['generate-names.pl', '-v', '--out', self.mySpecieFolderPath])
         subtools.generate_names(self.mySpecieFolderPath)
         print "finished name index \n"
 
@@ -151,7 +144,7 @@ class TrackHub:
 
         # Then we get the output to generate the chromSizes
         self.chromSizesFile = tempfile.NamedTemporaryFile(bufsize=0, suffix=".chrom.sizes")
-        subtools.sortChromSizes(twoBitInfoFile.name, self.chromSizesFile.name) 
+        subtools.sortChromSizes(twoBitInfoFile.name, self.chromSizesFile.name)
 
         # We can get the biggest scaffold here, with chromSizesFile
         with open(self.chromSizesFile.name, 'r') as chrom_sizes:

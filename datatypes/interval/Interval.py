@@ -13,10 +13,10 @@ class Interval(Datatype):
 
     def __init__(self):
         super(Interval, self).__init__()
-        if not Datatype.trackType:
-            self.trackType = "CanvasFeatures"
-        else:
+        if Datatype.trackType:
             self.trackType = Datatype.trackType
+        else:
+            self.trackType = "CanvasFeatures"
         logging.debug("Set default trackType = %s for feature tracks", self.trackType)
         self.trackFileType = "gff"
 
