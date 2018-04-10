@@ -110,11 +110,6 @@ class TrackHub:
 
     def _prepareRefseq(self):
         subtools.prepare_refseqs(self.reference_genome.false_path, self.mySpecieFolderPath)
-        #try:
-            #print os.path.join(self.tool_dir, 'prepare-refseqs.pl') + ", '--fasta', " + self.reference +", '--out', self.json])"
-            #subprocess.call(['prepare-refseqs.pl', '--fasta', self.reference_genome.false_path, '--out', self.mySpecieFolderPath])
-        #except OSError as e:
-            #print "Cannot prepare reference error({0}): {1}".format(e.errno, e.strerror)
 
     def _indexName(self):
         #subprocess.call(['generate-names.pl', '-v', '--out', self.mySpecieFolderPath])

@@ -1,4 +1,6 @@
+import os
 import json
+import shutil
 import logging
 import codecs
 
@@ -76,12 +78,13 @@ class Reader(object):
         
     def getRefGenome(self):
         array_inputs_reference_genome = self.args["fasta"]
-        # TODO: Replace these with the object Fasta
         input_fasta_file = array_inputs_reference_genome["false_path"]
         input_fasta_file_name = santitizer.sanitize_name_input(array_inputs_reference_genome["name"])
-        #genome_name = santitizer.sanitize_name_input(self.args["genome_name"])
+        # Add "fasta" extension because Apollo needs it to create annotation
+        refseq_file = os.path.join(os.path.dirname(input_fasta_file), input_fasta_file_name + ".fasta")
+        shutil.copyfile(input_fasta_file, refseq_file)
         genome_name = self.getGenomeName()
-        reference_genome = Fasta(input_fasta_file,
+        reference_genome = Fasta(refseq_file,
                              input_fasta_file_name, genome_name)
         return reference_genome
 

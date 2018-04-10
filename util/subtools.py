@@ -237,6 +237,13 @@ def createFastaIndex(fastaFile):
     else:
         raise ValueError('Did not find fai file')
 
+def generate_indexed_refseq_track(fastaFile, referenceName, outputFolder):
+    faiFile = createFastaIndex(fastaFile)
+    refSeqFile = os.path.join(outputFolder, referenceName)
+    refSeqIndexFile = os.path.join(outputFolder, referenceName+'.fai')
+    shutil.copy(fastaFile, refSeqFile)
+    shutil.copy(faiFile, refSeqIndexFile)
+
 def remove_gene_lines(gff3_file, gff3_filtered):
     with open(gff3_file, 'r') as f:
         with open(gff3_filtered, 'w') as out:
@@ -368,8 +375,10 @@ def add_track_json(trackList, track_json):
     p = subprocess.call(['add-track-json.pl', trackList], stdin=new_track.stdout)
     return p
 
-def prepare_refseqs(fasta_file_name, outputFolder):
-    array_call = ['prepare-refseqs.pl', '--fasta', fasta_file_name, '--out', outputFolder]
+def prepare_refseqs(fastaFile, outputFolder):
+    #array_call = ['prepare-refseqs.pl', '--fasta', fasta_file_name, '--out', outputFolder]
+    createFastaIndex(fastaFile)
+    array_call = ['prepare-refseqs.pl', '--indexed_fasta', fastaFile, '--out', outputFolder]
     p = _handleExceptionAndCheckCall(array_call)
     return p       
 
