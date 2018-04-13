@@ -1,4 +1,4 @@
-<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.0.1">
+<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.1">
     <description>
         This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse with Apollo plugin
     </description>
