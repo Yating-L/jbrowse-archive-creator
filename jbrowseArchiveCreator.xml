@@ -351,9 +351,8 @@ with open(file_path, 'w') as f:
                 </param>
             </when>
             <when value="off">
-                <param name="debug_mode" type="hidden"
-                       value="false">
-                </param>
+                <param name="debug_mode" type="hidden" value="false" />
+                <param name="feature_tracks_type" type="hidden" value="CanvasFeatures" />
             </when>
         </conditional>
     </inputs>

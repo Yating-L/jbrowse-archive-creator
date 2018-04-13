@@ -17,8 +17,6 @@ from util import santitizer
 
 class TrackHub:
     def __init__(self, inputFastaFile, outputFile, extra_files_path, tool_directory, trackType):
-        
-        self.rootAssemblyHub = None
 
         self.mySpecieFolderPath = None
 
@@ -41,7 +39,7 @@ class TrackHub:
 
         
         # Set all the missing variables of this class, and create physically the folders/files
-        self.rootAssemblyHub = self.__createAssemblyHub__(extra_files_path=extra_files_path)
+        self.__createAssemblyHub__(extra_files_path=extra_files_path)
         # Init the Datatype 
         Datatype.pre_init(self.reference_genome, self.chromSizesFile,
                           self.extra_files_path, self.tool_directory,
@@ -116,25 +114,14 @@ class TrackHub:
 
         with open(self.outputFile, 'w') as htmlfile:
             htmlMakoRendered = htmlTemplate.render(
-            species_folder = os.path.relpath(self.mySpecieFolderPath, self.extra_files_path),
+            jbrowse_hub_name = self.reference_genome.assembly_id,
             trackList = os.path.relpath(self.trackList, self.extra_files_path)
         )
             htmlfile.write(htmlMakoRendered)
-        #with open(self.outputFile, 'w') as htmlfile:
-        #    htmlstr = 'The new Organism "%s" is created on Apollo: <br>' % self.genome_name
-        #    jbrowse_hub = '<li><a href = "%s" target="_blank">View JBrowse Hub on Apollo</a></li>' % host_name
-        #    htmlstr += jbrowse_hub
-        #    htmlfile.write(htmlstr)   
-          
-
 
     def __createAssemblyHub__(self, extra_files_path):
         # Get all necessaries infos first
         # 2bit file creation from input fasta
-
-        # baseNameFasta = os.path.basename(fasta_file_name)
-        # suffixTwoBit, extensionTwoBit = os.path.splitext(baseNameFasta)
-        # nameTwoBit = suffixTwoBit + '.2bit'
         twoBitFile = tempfile.NamedTemporaryFile(bufsize=0)
         subtools.faToTwoBit(self.reference_genome.false_path, twoBitFile.name)
 
@@ -151,14 +138,8 @@ class TrackHub:
             # TODO: Check if exists
             self.default_pos = chrom_sizes.readline().split()[0]
 
-        # TODO: Manage to put every fill Function in a file dedicated for reading reasons
-        # Create the root directory
-        myHubPath = os.path.join(extra_files_path, "myHub")
-        if not os.path.exists(myHubPath):
-            os.makedirs(myHubPath)
-
-        # Create the specie folder
-        mySpecieFolderPath = os.path.join(myHubPath, self.genome_name)
+        # Create the specie folder, use generic name "myHub", to support display JBrowse with Galaxy display application
+        mySpecieFolderPath = os.path.join(extra_files_path, "myHub")
         if not os.path.exists(mySpecieFolderPath):
             os.makedirs(mySpecieFolderPath)
         self.mySpecieFolderPath = mySpecieFolderPath
@@ -179,5 +160,3 @@ class TrackHub:
         if not os.path.exists(myBinaryFolderPath):
             os.makedirs(myBinaryFolderPath)
         self.myBinaryFolderPath = myBinaryFolderPath
-
-        return myHubPath
