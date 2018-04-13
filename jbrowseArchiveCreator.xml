@@ -10,7 +10,7 @@
         <requirement type="package" version="1.9">numpy</requirement>
         <requirement type="package" version="1.68">biopython</requirement>
         <requirement type="package" version="340">ucsc_hac</requirement>
-        <requirement type="package" version="1.12.4">jbrowse_tools</requirement>
+        <requirement type="package" version="1.13.1">jbrowse_tools</requirement>
         <requirement type="package" version="1.0">gff3sort</requirement>
     </requirements>
 

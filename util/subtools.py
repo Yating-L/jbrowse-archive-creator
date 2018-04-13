@@ -298,13 +298,13 @@ def generate_tabix_indexed_track(inputFile, dataType, trackName, outputFolder):
         remove_gene_lines(inputFile, filteredFile.name)
         sortedFile = tempfile.NamedTemporaryFile(bufsize=0)
         gff3sort(filteredFile.name, sortedFile)
+        # add .gff3.gz extension to Tabix GFF3 files, in order to enable creating name index with generate-names.pl
+        trackName = trackName + '.gff3.gz'
     compressedFile = bgzip(sortedFile.name)
     tabixFile = createTabix(compressedFile, fileType)
     trackPath = os.path.join(outputFolder, trackName)
     trackIndexPath = os.path.join(outputFolder, trackName+'.tbi')
-    logging.debug("copying track file %s to trackPath %s", (trackName, trackPath))
     shutil.copy(compressedFile, trackPath)
-    logging.debug("copying track tabix file %s to trackIndexPath %s", (trackName+'.tbi', trackIndexPath))
     shutil.copy(tabixFile, trackIndexPath)
 
 def flatfile_to_json(inputFile, dataType, trackType, trackLabel, outputFolder, options=None, compress=True):
