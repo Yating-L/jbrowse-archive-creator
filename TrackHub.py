@@ -69,10 +69,10 @@ class TrackHub:
                 subtools.generate_tabix_indexed_track(trackDbObject['trackDataURL'], trackDbObject['dataType'], trackDbObject['track'], self.myFinalTracksFolderPath)
                 subtools.add_track_json(self.trackList, trackDbObject['options'])
 
-    def terminate(self, debug=False):
+    def terminate(self, debug="false"):
         """ Write html file """
         self._indexName()
-        if not debug:
+        if debug.lower() == "false":
             self._removeRaw()
         self._outHtml()
         print "Success!\n"
