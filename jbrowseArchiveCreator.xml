@@ -1,4 +1,4 @@
-<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.1">
+<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.1.1">
     <description>
         This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse with Apollo plugin
     </description>
@@ -359,7 +359,7 @@ with open(file_path, 'w') as f:
         <test>
             <param name="genome_name" value="Dbia3"/>
             <param name="fasta_file" value="common/dbia3.fa"/>
-            <output name="output" file="only_genome/only_genome.html">
+            <output name="output" file="only_genome/${tool.name}.html">
                 <!-- Use macro to check the whole common structure without repeated code -->
                 <expand macro="verify_hub_structure_no_track" test="only_genome" />
             </output>

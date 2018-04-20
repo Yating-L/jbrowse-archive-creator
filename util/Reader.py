@@ -37,7 +37,7 @@ class Reader(object):
             data_file = codecs.open(self.inputFile, 'r', 'utf-8')   
             return json.load(data_file) 
         except IOError:
-            print "Cannot find JSON file\n"
+            print ("Cannot find JSON file\n")
             exit(1)
 
     def getToolDir(self):

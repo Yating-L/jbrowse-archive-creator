@@ -1,32 +1,18 @@
 <macros>
     <xml name="verify_hub_structure" token_genome="Dbia3" token_test="common">
-        <extra_files type="directory" value="myHub/@GENOME@/names" compare="re_match"/>
-        <extra_files type="directory" value="myHub/@GENOME@/seq" compare="re_match"/>
-        <extra_files type="directory" value="myHub/@GENOME@/tracks" compare="re_match"/>
-        <extra_files type="file" name="myHub/@GENOME@/css/custom_track_styles.css" value="@TEST@/myHub/@GENOME@/css/custom_track_styles.css" />
-        <extra_files type="file" name="myHub/@GENOME@/tracks.conf" value="@TEST@/myHub/@GENOME@/tracks.conf" />
-        <extra_files type="file" name="myHub/@GENOME@/trackList.json">
-            <assert_contents>
-                <has_text text="tracks"/>
-                <has_text text="css"/>
-                <has_text text="names"/>
-                <has_text text="formatVersion"/>
-            </assert_contents>
-        </extra_files>
+        <expand macro="verify_hub_structure_no_track" test="only_genome" />
+        <extra_files type="directory" value="@TEST@/myHub/tracks" compare="re_match"/>
     </xml>
 
     <xml name="verify_hub_structure_no_track" token_genome="Dbia3" token_test="common">
-        <extra_files type="file" name="myHub/@GENOME@/trackList.json" >
-            <assert_contents>
-                <has_text text="tracks"/>
-                <has_text text="css"/>
-                <has_text text="names"/>
-                <has_text text="formatVersion"/>
-            </assert_contents>
-        </extra_files>
-        <extra_files type="file" name="myHub/@GENOME@/css/custom_track_styles.css" value="@TEST@/myHub/@GENOME@/css/custom_track_styles.css" />
+        <!-- trackList.json -->
+        <extra_files type="file" name="myHub/trackList.json" value="@TEST/myHub/trackList.json" />
+        <!-- seq/refSeqs.json -->
+        <extra_files type="file" name="myHub/seq/refSeqs.json" value="@TEST/myHub/seq/refSeqs.json" />
+        <!-- name/meta.json -->
+        <extra_files type="file" name="myHub/names/meta.json" value="@TEST/myHub/names/meta.json" />
+        <extra_files type="directory" value="@TEST@/myHub/names" compare="re_match"/>
+        <extra_files type="directory" value="@TEST@/myHub/seq" compare="re_match"/>
     </xml>
-
-    
 
 </macros>
