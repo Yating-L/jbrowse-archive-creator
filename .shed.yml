@@ -2,7 +2,7 @@ categories: [Visualization]
 description: A tool to create a JBrowse track hub
 name: jbrowsearchivecreator
 owner: yating-l
-remote_repository_url: https://github.com/Yating-L/jbrowse-archive-creator.git
+remote_repository_url: https://github.com/goeckslab/jbrowse-archive-creator.git
 exclude:
   - tool_test_output.html
   - tool_test_output.json
