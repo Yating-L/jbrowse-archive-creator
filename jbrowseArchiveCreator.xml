@@ -7,6 +7,7 @@
     </macros>
     <requirements>
         <requirement type="package" version="1.2">samtools</requirement>
+        <requirement type="package" version="0.2.6">tabix</requirement>
         <requirement type="package" version="1.9">numpy</requirement>
         <requirement type="package" version="1.68">biopython</requirement>
         <requirement type="package" version="340">ucsc_hac</requirement>

@@ -14,7 +14,7 @@ class BedBlastAlignments( BigPsl ):
 
         super(BedBlastAlignments, self).__init__(input_bed_blast_alignments_false_path, data_bed_blast_alignments)
         #self.seqType = 1
-        self.trackType = "G-OnRamp_plugin/BlastAlignment"
+        #self.trackType = "G-OnRamp_plugin/BlastAlignment"
 
     def initSettings(self):
         super(BedBlastAlignments, self).initSettings()
