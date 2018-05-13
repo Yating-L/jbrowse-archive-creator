@@ -65,6 +65,7 @@ def gff3_writer(blast_records, gff3_file):
             group['parent_field']['source'] = source
             group['parent_field']['type'] = 'match'
             group['parent_attribute']['ID'] = contig_name + '_' + query_name
+            group['parent_attribute']['Name'] = query_name
             group['parent_attribute']['method'] = method
             group['parent_attribute']['length'] = length
             if contig_name not in seq_regions:
