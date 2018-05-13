@@ -30,6 +30,8 @@ class CanvasFeatures(TrackDb):
             track['glyph'] = "JBrowse/View/FeatureGlyph/Segments"
         else:
             track['urlTemplate'] = os.path.join('tracks', self.trackName)
+        if 'subfeatureClasses' in self.extraSettings:
+            track['subfeatureClasses'] = self.extraSettings['subfeatureClasses']
         track['label'] = self.trackLabel
         track['category'] = self.extraSettings['category']
         track['style'] = self.extraSettings['style']
