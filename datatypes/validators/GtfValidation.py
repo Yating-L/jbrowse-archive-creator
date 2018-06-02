@@ -74,7 +74,7 @@ class GtfValidation(DataValidation):
                         start_position = fields[3]
                         end_position = fields[4]
 
-                        if start_position > 0 and end_position <= scaffold_size:
+                        if int(start_position) > 0 and int(end_position) <= int(scaffold_size):
                             # We are good, so we copy this line
                             tmp.write(line)
                             tmp.write(os.linesep)
