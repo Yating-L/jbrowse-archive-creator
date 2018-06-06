@@ -383,7 +383,7 @@ def prepare_refseqs(fastaFile, outputFolder):
     return p       
 
 def generate_names(outputFolder, hashBits=4):
-    array_call = ['generate-names.pl', '--hashBits', '4', '-v', '--out', outputFolder]
+    array_call = ['generate-names.pl', '--hashBits', '4', '-v', '--completionLimit', '0', '--out', outputFolder]
     p = _handleExceptionAndCheckCall(array_call)
     return p  
    

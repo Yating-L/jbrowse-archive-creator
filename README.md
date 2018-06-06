@@ -1,5 +1,5 @@
 # JBrowse Hub Creator
-This Galaxy tool permits to prepare your files to be ready for JBrowse visualization.
+This Galaxy tool is used to prepare your files to be ready for JBrowse visualization.
 
 ## Features
 1. Similar interface to Hub Archive Creator.
@@ -7,33 +7,36 @@ This Galaxy tool permits to prepare your files to be ready for JBrowse visualiza
 3. Group the tracks 
 4. Set the color for each track
 5. Set the label for each track
-6. Create workflows within Galaxy to automatize pipeline analysis and get them ready to visualization inside JBrowse...in a few clicks!
+6. Support generating Tabix Indexed CanVasFeatures tracks
+7. Create workflows within Galaxy to automatize pipeline analysis and get them ready to visualization inside JBrowse...in a few clicks!
 
 At the moment, Supported datatypes are:
-- Bam
-- Bed 
+- BAM
+- BED
+  - Generic BED
   - Splice Junctions (BED 12+1)
   - Simple Repeats (BED 4+12)
+  - BLAT alignment (BigPsl)
+  - BLAST alignment (BED 12+12)
 - BigWig
-- Gff3
-- Gtf
-- Blastxml
-- BigPsl
+- GFF3
+- GTF
+- Blast XML output
 
 ## Installation:
-1. You would need to add this tool into your Galaxy.
-  1. (strongly preferred) **ToolShed Installation**: Tool is in [testtoolshed](https://testtoolshed.g2.bx.psu.edu/view/yating-l/jbrowse_hub/b7bf45272ab7)
-  2. OR **Local Installation**: See https://wiki.galaxyproject.org/Admin/Tools/AddToolTutorial
-2. The tool can be used with or without Conda (activate it in your galaxy.ini)
-3. If installed without TS (by downloading on GitHub), you need to have all the binaries accessible within Galaxy.
-   You can use the script [install_linux_binaries](util/install_linux_binaries) with a linux x86-64 (64bits)
 
+**ToolShed Installation**: 
+
+- The JBrowse Archive Creator tool is published at [ToolShed Repository](https://toolshed.g2.bx.psu.edu/view/yating-l/jbrowsearchivecreator)
+
+- Refer to [Installing Tools into Galaxy](https://galaxyproject.org/admin/tools/add-tool-from-toolshed-tutorial) tutorial if you want to learn how to install a tool from ToolShed.
+  
 ## Future
 See [TODO.md](todo.md) for more information
 
 ## Contribute
 
-- Source Code: https://github.com/Yating-L/jbrowse_hub
+- Source Code: https://github.com/goeckslab/jbrowse-archive-creator.git
 
 ## Support
 
@@ -41,7 +44,7 @@ If you are having issues, please let us know.
 
 - For more information about how to use G-OnRamp:
     - [Wilson Leung](wleung@wustl.edu) - Product owner and developer
-    - [Yating Liu](yliu41@wustl.edu) - Community manager and Developer
+    - [Yating Liu](yliu41@wustl.edu) - Community manager and developer
 
 - For more information about the project vision, or for partneship:
     - [Elgin, Sarah](selgin@wustl.edu) - PI
