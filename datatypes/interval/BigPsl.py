@@ -26,7 +26,7 @@ class BigPsl(Interval):
     def initSettings(self):
         super(BigPsl, self).initSettings()
         self.extraSettings["glyph"] = "JBrowse/View/FeatureGlyph/Segments"  
-        #self.extraSettings["subfeatureClasses"] = "match_part"
+
 
     def validateData(self):
         self.validateOptions = self.getValidateOptions(tab="True", autoSql=self.autoSql)

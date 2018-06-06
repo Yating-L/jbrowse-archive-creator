@@ -26,10 +26,10 @@ class CanvasFeatures(TrackDb):
         if self.dataType == 'gff':
             # need .gff3.gz extension to index the name of the track with generate-name.pl
             track['urlTemplate'] = os.path.join('tracks', self.trackName + '.gff3.gz')
-            # needed to show match_part in Blat and Blast alignment as subfeatures
-            track['glyph'] = "JBrowse/View/FeatureGlyph/Segments"
         else:
             track['urlTemplate'] = os.path.join('tracks', self.trackName)
+        if 'glyph' in self.extraSettings:
+            track['glyph'] = self.extraSettings['glyph']
         if 'subfeatureClasses' in self.extraSettings:
             track['subfeatureClasses'] = self.extraSettings['subfeatureClasses']
         track['label'] = self.trackLabel
