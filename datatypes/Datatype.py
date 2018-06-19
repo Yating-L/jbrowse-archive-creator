@@ -98,6 +98,8 @@ class Datatype(object):
             self.extraSettings["category"] = self.trackSettings["group_name"]
         if "track_color" in self.trackSettings and self.trackSettings["track_color"]:
             self.extraSettings["color"] = self.trackSettings["track_color"]
+        #store information of whether to generate name index for the track
+        self.extraSettings["nameIndex"] = self.trackSettings["nameIndex"]
         
         
     @abc.abstractmethod

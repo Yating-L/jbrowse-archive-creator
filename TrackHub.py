@@ -51,10 +51,12 @@ class TrackHub:
         if Datatype.trackType == 'HTMLFeatures':
             self.myTrackStyle = TrackStyles(self.tool_directory, self.mySpecieFolderPath, self.trackList)
         self.logger = logging.getLogger(__name__)
+        self.nameIndexTrackList = []
 
-    
 
     def addTrack(self, trackDbObject):
+        if trackDbObject['nameIndex'] == "true":
+            self.nameIndexTrackList.append(trackDbObject['trackLabel'])
         if trackDbObject['dataType'].lower() == 'bam':
             subtools.add_track_json(self.trackList, trackDbObject['options'])
         elif trackDbObject['dataType'].lower() == 'bigwig':
@@ -104,8 +106,9 @@ class TrackHub:
         subtools.prepare_refseqs(self.reference_genome.false_path, self.mySpecieFolderPath)
 
     def _indexName(self):
-        subtools.generate_names(self.mySpecieFolderPath)
-        print "finished name index \n"
+        if self.nameIndexTrackList:
+            subtools.generate_names(self.mySpecieFolderPath, self.nameIndexTrackList)
+            print "finished name index \n"
 
     def _outHtml(self):
         mylookup = TemplateLookup(directories=[os.path.join(self.tool_directory, 'templates')],

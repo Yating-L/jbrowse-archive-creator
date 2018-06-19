@@ -40,7 +40,8 @@ class TrackDb(object):
                 ("dataType", self.dataType),
                 ("trackType", self.trackType)]
                 )
-        
+
+        self.track_db["nameIndex"] = self.extraSettings['nameIndex']
         
         extraConfigs = self.prepareExtraSetting()
         self.logger.debug("Generate extraConfigs = %s", json.dumps(extraConfigs))

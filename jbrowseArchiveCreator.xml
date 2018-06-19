@@ -1,4 +1,4 @@
-<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.1.6">
+<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.2.1">
     <description>
         This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse with Apollo plugin
     </description>
@@ -81,6 +81,7 @@ file_path = sys.argv[1]
         #set track_color = str($f.formatChoice.track_color)
         #set group_name = str($g.group_name)
         #set longLabel = str($f.formatChoice.longLabel)
+
         #set extra_data_dict = {"track_color": $track_color,
                                 "group_name": $group_name,
                                 "long_label": $longLabel}
@@ -88,11 +89,12 @@ file_path = sys.argv[1]
             #set bam_index = $f.formatChoice.BAM.metadata.bam_index
 
             ## Add Bam format specific fields
-            #silent $extra_data_dict.update({"index": $bam_index})
+            #silent $extra_data_dict.update({"index": $bam_index, "nameIndex": str($f.formatChoice.nameIndex)})
 
             #silent $prepare_json("Bam", $f.formatChoice.BAM, $index_track_final, $extra_data_dict)
         #end if
         #if $f.formatChoice.format_select == "bed"
+            #silent $extra_data_dict.update({"nameIndex": str($f.formatChoice.bedChoice.nameIndex)})
             #if $f.formatChoice.bedChoice.bed_select == "bed_generic"
                 #silent $prepare_json("Bed", $f.formatChoice.bedChoice.BED_generic, $index_track_final,
                                                 $extra_data_dict)
@@ -119,18 +121,22 @@ file_path = sys.argv[1]
             #end if
         #end if
         #if $f.formatChoice.format_select == "blastxml"
-                #silent $prepare_json("BlastXml", $f.formatChoice.BlastXML, $index_track_final, 
+            #silent $extra_data_dict.update({"nameIndex": str($f.formatChoice.nameIndex)})
+            #silent $prepare_json("BlastXml", $f.formatChoice.BlastXML, $index_track_final,
                                             extra_data_dict)
         #end if
         #if $f.formatChoice.format_select == "bigwig"
+            #silent $extra_data_dict.update({"nameIndex": str($f.formatChoice.nameIndex)})
             #silent $prepare_json("BigWig", $f.formatChoice.BIGWIG, $index_track_final,
                                             $extra_data_dict)
         #end if
         #if $f.formatChoice.format_select == 'gff3'
+            #silent $extra_data_dict.update({"nameIndex": str($f.formatChoice.nameIndex)})
             #silent $prepare_json("Gff3", $f.formatChoice.GFF3, $index_track_final,
                                             $extra_data_dict)
         #end if
         #if $f.formatChoice.format_select == "gtf"
+            #silent $extra_data_dict.update({"nameIndex": str($f.formatChoice.nameIndex)})
             ## Add also GTF from Agustus? See https://github.com/ENCODE-DCC/kentUtils/issues/8
             #silent $prepare_json("Gtf", $f.formatChoice.GTF, $index_track_final,
                                              $extra_data_dict)
@@ -200,6 +206,7 @@ with open(file_path, 'w') as f:
                                 </valid>
                             </sanitizer>
                         </param>
+                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                     </when>     
                     <when value="bed">
                         <conditional name="bedChoice">
@@ -217,6 +224,7 @@ with open(file_path, 'w') as f:
                                         type="data"
                                         label="Bed File"
                                 />
+                                <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                             </when>
                             <when value="bed_simple_repeats_option">
                                 <param
@@ -225,6 +233,7 @@ with open(file_path, 'w') as f:
                                         type="data"
                                         label="Bed Simple Repeats (Bed4+12) File"
                                 />
+                                <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                             </when>
                             <when value="bed_splice_junctions_option">
                                 <param
@@ -233,6 +242,7 @@ with open(file_path, 'w') as f:
                                         type="data"
                                         label="Bed Splice Junctions (Bed12+1) File"
                                 />
+                                <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                             </when>
                             <when value="bed_blast_alignment_option">
                                 <param
@@ -241,6 +251,7 @@ with open(file_path, 'w') as f:
                                         type="data"
                                         label="Bed Blast Alignments (Bed12+12) File"
                                 />
+                                <param name="nameIndex" type="boolean" checked="true" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                             </when>
                             <when value="bed_blat_alignment_option">
                                 <param
@@ -249,6 +260,7 @@ with open(file_path, 'w') as f:
                                         type="data"
                                         label="Bed BLAT Alignments (bigPsl) File"
                                 />
+                                <param name="nameIndex" type="boolean" checked="true" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                             </when>
                         </conditional>
                         <param name="longLabel" type="text" size="30" label="Track label" />
@@ -275,6 +287,7 @@ with open(file_path, 'w') as f:
                                 </valid>
                             </sanitizer>
                         </param>
+                        <param name="nameIndex" type="boolean" checked="true" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                     </when>
                     <when value="bigwig">
                         <param
@@ -291,6 +304,7 @@ with open(file_path, 'w') as f:
                                 </valid>
                             </sanitizer>
                         </param>
+                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                     </when>
                     <when value="gff3">
                         <param
@@ -307,6 +321,7 @@ with open(file_path, 'w') as f:
                                 </valid>
                             </sanitizer>
                         </param>
+                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                     </when>
                     <when value="gtf">
                         <param
@@ -323,7 +338,8 @@ with open(file_path, 'w') as f:
                                 </valid>
                             </sanitizer>
                         </param>
-                    </when>  
+                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
+                    </when>
                 </conditional>
             </repeat>
         </repeat>
