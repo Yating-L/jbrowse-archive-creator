@@ -1,4 +1,4 @@
-<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.1.5">
+<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.1.6">
     <description>
         This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse with Apollo plugin
     </description>
@@ -204,7 +204,7 @@ with open(file_path, 'w') as f:
                     <when value="bed">
                         <conditional name="bedChoice">
                             <param name="bed_select" type="select" label="Bed Choice">
-                                <option value="bed_generic">BED format</option>
+                                <option value="bed_generic">BED Generic</option>
                                 <option value="bed_simple_repeats_option">BED Simple repeat (bed4+12 / simpleRepeat.as)</option>
                                 <option value="bed_splice_junctions_option">BED Splice junctions (bed12+1 / spliceJunctions.as)</option>
                                 <option value="bed_blast_alignment_option">Blast alignments (bed12+12 / bigPsl.as)</option>
