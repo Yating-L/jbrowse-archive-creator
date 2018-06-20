@@ -6,7 +6,6 @@ import string
 
 from Interval import Interval
 from util.index.DatabaseIndex import DatabaseIndex
-from util.index.TrixIndex import TrixIndex
 from datatypes.validators.DataValidation import DataValidation
 from datatypes.converters.DataConversion import DataConversion
 
@@ -25,7 +24,10 @@ class BigPsl(Interval):
         
     def initSettings(self):
         super(BigPsl, self).initSettings()
-        self.extraSettings["glyph"] = "JBrowse/View/FeatureGlyph/Segments"  
+        self.extraSettings["glyph"] = "JBrowse/View/FeatureGlyph/Segments"
+        if "database" in self.trackSettings:
+            self.database_settings = DatabaseIndex(database=self.trackSettings["database"], seqType=self.seqType).setExtLink()
+            self.extraSettings["menuTemplate"] = self.database_settings
 
 
     def validateData(self):

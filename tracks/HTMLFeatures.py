@@ -31,7 +31,11 @@ class HTMLFeatures(TrackDb):
             self.extraSettings['config']['category'] = "Default group"
         else:
             self.extraSettings['config']['category'] = self.extraSettings['category']
-    
+
+        if "menuTemplate" in self.extraSettings:
+            self.extraSettings["clientConfig"]["menuTemplate"] = [{}, self.extraSettings["menuTemplate"]]
+            #self.extraSettings["clentConfig"]["menuTemplate"] += [{"label" : "View details"}, {"label" : "Highlight this gene"}, self.extraSettings["menuTemplate"]]
+
         extraConfigs['config'] = json.dumps(self.extraSettings["config"])
         extraConfigs['clientConfig'] = json.dumps(self.extraSettings["clientConfig"])
         return extraConfigs

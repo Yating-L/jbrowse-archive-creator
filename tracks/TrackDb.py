@@ -42,7 +42,7 @@ class TrackDb(object):
                 )
 
         self.track_db["nameIndex"] = self.extraSettings['nameIndex']
-        
+
         extraConfigs = self.prepareExtraSetting()
         self.logger.debug("Generate extraConfigs = %s", json.dumps(extraConfigs))
         self.track_db["options"] = extraConfigs

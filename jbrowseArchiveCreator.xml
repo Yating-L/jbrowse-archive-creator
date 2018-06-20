@@ -1,4 +1,4 @@
-<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.2.1">
+<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.3.0">
     <description>
         This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse with Apollo plugin
     </description>
@@ -108,20 +108,21 @@ file_path = sys.argv[1]
                                                 $extra_data_dict)
             #end if
             #if $f.formatChoice.bedChoice.bed_select == "bed_blast_alignment_option"
-                ##set database = str($f.formatChoice.bedChoice.database)
-                ##silent $extra_data_dict.update({"database": $database})
+                #set database = str($f.formatChoice.bedChoice.database)
+                #silent $extra_data_dict.update({"database": $database})
                 #silent $prepare_json("BedBlastAlignments", $f.formatChoice.bedChoice.BED_blast_alignment, $index_track_final,
                                              $extra_data_dict)
             #end if
             #if $f.formatChoice.bedChoice.bed_select == "bed_blat_alignment_option"
-                ##set database = str($f.formatChoice.bedChoice.database)
-                ##silent $extra_data_dict.update({"database": $database})
+                #set database = str($f.formatChoice.bedChoice.database)
+                #silent $extra_data_dict.update({"database": $database})
                 #silent $prepare_json("BedBlatAlignments", $f.formatChoice.bedChoice.BED_blat_alignment, $index_track_final,
                                              $extra_data_dict)
             #end if
         #end if
         #if $f.formatChoice.format_select == "blastxml"
-            #silent $extra_data_dict.update({"nameIndex": str($f.formatChoice.nameIndex)})
+            #set database = str($f.formatChoice.database)
+            #silent $extra_data_dict.update({"database": $database, "nameIndex": str($f.formatChoice.nameIndex)})
             #silent $prepare_json("BlastXml", $f.formatChoice.BlastXML, $index_track_final,
                                             extra_data_dict)
         #end if
@@ -251,6 +252,12 @@ with open(file_path, 'w') as f:
                                         type="data"
                                         label="Bed Blast Alignments (Bed12+12) File"
                                 />
+                                <param name="database" type="select" label="Protein database">
+                                    <option value="NCBI" selected="true">NCBI</option>
+                                    <option value="UniProt">UniProt</option>
+                                    <option value="FlyBase">FlyBase</option>
+                                    <option value="Others">Others</option>
+                                </param>
                                 <param name="nameIndex" type="boolean" checked="true" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                             </when>
                             <when value="bed_blat_alignment_option">
@@ -260,6 +267,10 @@ with open(file_path, 'w') as f:
                                         type="data"
                                         label="Bed BLAT Alignments (bigPsl) File"
                                 />
+                                <param name="database" type="select" label="mRNA database">
+                                    <option value="NCBI" selected="true">NCBI</option>
+                                    <option value="Others">Others</option>
+                                </param>
                                 <param name="nameIndex" type="boolean" checked="true" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                             </when>
                         </conditional>
@@ -279,6 +290,12 @@ with open(file_path, 'w') as f:
                                 type="data"
                                 label="Blast Alignments File"
                         />
+                        <param name="database" type="select" label="Protein database">
+                            <option value="NCBI" selected="true">NCBI</option>
+                            <option value="UniProt">UniProt</option>
+                            <option value="FlyBase">FlyBase</option>
+                            <option value="Others">Others</option>
+                        </param>
                         <param name="longLabel" type="text" size="30" value="Blast Alignment" label="Track label" />
                         <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>

@@ -35,6 +35,9 @@ class CanvasFeatures(TrackDb):
         track['label'] = self.trackLabel
         track['category'] = self.extraSettings['category']
         track['style'] = self.extraSettings['style']
+        if "menuTemplate" in self.extraSettings:
+            track["menuTemplate"] = [{}, self.extraSettings["menuTemplate"]]
+            #self.track["menuTemplate"] += [{"label" : "View details"}, {"label" : "Highlight this gene"}, self.extraSettings["menuTemplate"]]
         extraConfigs = track
         return extraConfigs
 
