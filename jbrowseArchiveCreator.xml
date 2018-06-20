@@ -1,4 +1,4 @@
-<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.3.0">
+<tool id="jbrowse_hub" name="JBrowse Archive Creator" version="2.3.1">
     <description>
         This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse with Apollo plugin
     </description>
@@ -199,6 +199,7 @@ with open(file_path, 'w') as f:
                                 type="data"
                                 label="BAM File"
                         />
+                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                         <param name="longLabel" type="text" size="30" value = "Sequence Alignment" label="Track label" />
                         <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>
@@ -207,7 +208,6 @@ with open(file_path, 'w') as f:
                                 </valid>
                             </sanitizer>
                         </param>
-                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                     </when>     
                     <when value="bed">
                         <conditional name="bedChoice">
@@ -296,6 +296,7 @@ with open(file_path, 'w') as f:
                             <option value="FlyBase">FlyBase</option>
                             <option value="Others">Others</option>
                         </param>
+                        <param name="nameIndex" type="boolean" checked="true" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                         <param name="longLabel" type="text" size="30" value="Blast Alignment" label="Track label" />
                         <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>
@@ -304,7 +305,6 @@ with open(file_path, 'w') as f:
                                 </valid>
                             </sanitizer>
                         </param>
-                        <param name="nameIndex" type="boolean" checked="true" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                     </when>
                     <when value="bigwig">
                         <param
@@ -313,6 +313,7 @@ with open(file_path, 'w') as f:
                                 type="data"
                                 label="BIGWIG File"
                         />
+                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                         <param name="longLabel" type="text" size="30" value="Sequence Coverage" label="Track label" />
                         <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>
@@ -321,7 +322,6 @@ with open(file_path, 'w') as f:
                                 </valid>
                             </sanitizer>
                         </param>
-                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                     </when>
                     <when value="gff3">
                         <param
@@ -330,6 +330,7 @@ with open(file_path, 'w') as f:
                             type="data"
                             label="GFF3 File"
                         />
+                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                         <param name="longLabel" type="text" size="30" value="Gene Prediction" label="Track name" />
                         <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>
@@ -338,7 +339,6 @@ with open(file_path, 'w') as f:
                                 </valid>
                             </sanitizer>
                         </param>
-                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                     </when>
                     <when value="gtf">
                         <param
@@ -347,6 +347,7 @@ with open(file_path, 'w') as f:
                                 type="data"
                                 label="GTF File"
                         />
+                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                         <param name="longLabel" type="text" size="30" value="Assembled Transcripts" label="Track name" />
                         <param name="track_color" type="color" label="Track color" value="#000000">
                             <sanitizer>
@@ -355,7 +356,6 @@ with open(file_path, 'w') as f:
                                 </valid>
                             </sanitizer>
                         </param>
-                        <param name="nameIndex" type="boolean" label="Do you want to builds name indexes for this track to enable search for a feature by name" />
                     </when>
                 </conditional>
             </repeat>
