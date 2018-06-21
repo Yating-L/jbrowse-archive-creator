@@ -294,10 +294,11 @@ def generate_tabix_indexed_track(inputFile, dataType, trackName, outputFolder):
         bedSort(inputFile, sortedFile)
     elif "gff" in dataType:
         fileType = 'gff'
-        filteredFile = tempfile.NamedTemporaryFile(bufsize=0)
-        remove_gene_lines(inputFile, filteredFile.name)
+        #filteredFile = tempfile.NamedTemporaryFile(bufsize=0)
+        #remove_gene_lines(inputFile, filteredFile.name)
         sortedFile = tempfile.NamedTemporaryFile(bufsize=0)
-        gff3sort(filteredFile.name, sortedFile)
+        #gff3sort(filteredFile.name, sortedFile)
+        gff3sort(inputFile, sortedFile)
         # add .gff3.gz extension to Tabix GFF3 files, in order to enable creating name index with generate-names.pl
         trackName = trackName + '.gff3.gz'
     compressedFile = bgzip(sortedFile.name)
