@@ -30,8 +30,6 @@ class CanvasFeatures(TrackDb):
             track['urlTemplate'] = os.path.join('tracks', self.trackName)
         if 'glyph' in self.extraSettings:
             track['glyph'] = self.extraSettings['glyph']
-        if 'transcriptType' in self.extraSettings:
-            track['transcriptType'] = self.extraSettings['transcriptType']
         if 'subfeatureClasses' in self.extraSettings:
             track['subfeatureClasses'] = self.extraSettings['subfeatureClasses']
         track['label'] = self.trackLabel
