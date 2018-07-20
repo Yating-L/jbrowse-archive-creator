@@ -384,8 +384,9 @@ def prepare_refseqs(fastaFile, outputFolder):
 
 def generate_names(outputFolder, nameIndexTrackList, hashBits=4):
     array_call = ['generate-names.pl', '--hashBits', str(hashBits), '-v', '--completionLimit', '0', '--out', outputFolder]
-    array_call.append('--tracks')
-    array_call.append(','.join(nameIndexTrackList))
+    if nameIndexTrackList:
+        array_call.append('--tracks')
+        array_call.append(','.join(nameIndexTrackList))
     p = _handleExceptionAndCheckCall(array_call)
     return p  
    

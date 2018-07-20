@@ -106,9 +106,8 @@ class TrackHub:
         subtools.prepare_refseqs(self.reference_genome.false_path, self.mySpecieFolderPath)
 
     def _indexName(self):
-        if self.nameIndexTrackList:
-            subtools.generate_names(self.mySpecieFolderPath, self.nameIndexTrackList)
-            print "finished name index \n"
+        subtools.generate_names(self.mySpecieFolderPath, self.nameIndexTrackList)
+        print "finished name index \n"
 
     def _outHtml(self):
         mylookup = TemplateLookup(directories=[os.path.join(self.tool_directory, 'templates')],
