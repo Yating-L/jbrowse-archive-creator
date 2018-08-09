@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+Create tracks for input genome data, create name indexes, and generate the trackList.json file
+"""
 
 import os
 import subprocess
@@ -15,7 +18,10 @@ from util import subtools
 from util import santitizer
 
 
-class TrackHub:
+class TrackHub(object):
+    """Create tracks for input genome data, create name indexes, and generate the trackList.json file
+
+    """
     def __init__(self, inputFastaFile, outputFile, extra_files_path, tool_directory, trackType):
 
         self.mySpecieFolderPath = None
@@ -55,6 +61,16 @@ class TrackHub:
 
 
     def addTrack(self, trackDbObject):
+        """Add tracks to the JBrowse archive
+
+        Args:
+            trackDbObject (dict): contains information about nameIndex, dataType, trackType, trackDataURL, and etc.
+
+        Examples:
+            trackDbObject['nameIndex'] == 'true', add this track to the nameIndexTrackList for creating name index later
+            trackDbObject['trackType'] == 'HTMLFeatures', use flatfile_to_json to create the track
+            trackDbObject['trackType'] == 'CanVasFeatures', use generate_tabix_indexed_track to create the track
+        """
         if trackDbObject['nameIndex'] == "true":
             self.nameIndexTrackList.append(trackDbObject['trackLabel'])
         if trackDbObject['dataType'].lower() == 'bam':
@@ -72,7 +88,14 @@ class TrackHub:
                 subtools.add_track_json(self.trackList, trackDbObject['options'])
 
     def terminate(self, debug="false"):
-        """ Write html file """
+        """ Make name search indexes and write a HTML file
+
+        Args:
+            debug (bool): specify whether it is debug mode. Default: false.
+
+        Examples:
+            terminate(debug = "false"), remove all intermediate files
+        """
         self._indexName()
         if debug.lower() == "false":
             self._removeRaw()
@@ -162,3 +185,6 @@ class TrackHub:
         if not os.path.exists(myBinaryFolderPath):
             os.makedirs(myBinaryFolderPath)
         self.myBinaryFolderPath = myBinaryFolderPath
+
+if __name__ == '__main__':
+    pass

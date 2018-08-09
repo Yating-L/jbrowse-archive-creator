@@ -1,0 +1,148 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>datatypes.interval.BigPsl &#8212; JBrowse Archive Creator 2.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for datatypes.interval.BigPsl</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="kn">from</span> <span class="nn">Interval</span> <span class="k">import</span> <span class="n">Interval</span>
+<span class="kn">from</span> <span class="nn">util.index.DatabaseIndex</span> <span class="k">import</span> <span class="n">DatabaseIndex</span>
+<span class="kn">from</span> <span class="nn">datatypes.validators.DataValidation</span> <span class="k">import</span> <span class="n">DataValidation</span>
+<span class="kn">from</span> <span class="nn">datatypes.converters.DataConversion</span> <span class="k">import</span> <span class="n">DataConversion</span>
+
+
+<div class="viewcode-block" id="BigPsl"><a class="viewcode-back" href="../../../source/datatypes.interval.html#datatypes.interval.BigPsl.BigPsl">[docs]</a><span class="k">class</span> <span class="nc">BigPsl</span><span class="p">(</span><span class="n">Interval</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_bigpsl_false_path</span><span class="p">,</span> <span class="n">data_bigpsl</span><span class="p">):</span>
+    
+        <span class="nb">super</span><span class="p">(</span><span class="n">BigPsl</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputFile</span> <span class="o">=</span> <span class="n">input_bigpsl_false_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trackSettings</span> <span class="o">=</span> <span class="n">data_bigpsl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataType</span> <span class="o">=</span> <span class="s2">&quot;bed&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bedFields</span> <span class="o">=</span> <span class="mi">12</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extFields</span> <span class="o">=</span> <span class="mi">12</span>
+        <span class="c1">#self.seqType = None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">autoSql</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_directory</span><span class="p">,</span> <span class="s1">&#39;bigPsl.as&#39;</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="BigPsl.initSettings"><a class="viewcode-back" href="../../../source/datatypes.interval.html#datatypes.interval.BigPsl.BigPsl.initSettings">[docs]</a>    <span class="k">def</span> <span class="nf">initSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BigPsl</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">initSettings</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extraSettings</span><span class="p">[</span><span class="s2">&quot;glyph&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;JBrowse/View/FeatureGlyph/Segments&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;database&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trackSettings</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">database_settings</span> <span class="o">=</span> <span class="n">DatabaseIndex</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trackSettings</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">],</span> <span class="n">seqType</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seqType</span><span class="p">)</span><span class="o">.</span><span class="n">setExtLink</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extraSettings</span><span class="p">[</span><span class="s2">&quot;menuTemplate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">database_settings</span></div>
+
+
+<div class="viewcode-block" id="BigPsl.validateData"><a class="viewcode-back" href="../../../source/datatypes.interval.html#datatypes.interval.BigPsl.BigPsl.validateData">[docs]</a>    <span class="k">def</span> <span class="nf">validateData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validateOptions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValidateOptions</span><span class="p">(</span><span class="n">tab</span><span class="o">=</span><span class="s2">&quot;True&quot;</span><span class="p">,</span> <span class="n">autoSql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">autoSql</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">DataValidation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputFile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getValidateType</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">chromSizesFile</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">validateOptions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BigPsl.createTrack"><a class="viewcode-back" href="../../../source/datatypes.interval.html#datatypes.interval.BigPsl.BigPsl.createTrack">[docs]</a>    <span class="k">def</span> <span class="nf">createTrack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convertType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConvertType</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">converter</span> <span class="o">=</span> <span class="n">DataConversion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputFile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trackDataURL</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chromSizesFile</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">convertType</span><span class="p">,</span> <span class="s1">&#39;blat&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">converter</span><span class="o">.</span><span class="n">convertFormats</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trackFileType</span></div>
+    
+<div class="viewcode-block" id="BigPsl.getValidateType"><a class="viewcode-back" href="../../../source/datatypes.interval.html#datatypes.interval.BigPsl.BigPsl.getValidateType">[docs]</a>    <span class="k">def</span> <span class="nf">getValidateType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bedFields</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">extFields</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Invalid bigPsl format, no </span><span class="si">{0}</span><span class="s2"> or </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;bedFields&quot;</span><span class="p">,</span> <span class="s2">&quot;extFields&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataType</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bedFields</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;+&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extFields</span><span class="p">)</span></div>
+    
+    <span class="k">def</span> <span class="nf">_getSeqType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputFile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">bigpsl</span><span class="p">:</span>
+            <span class="n">sampleSeq</span> <span class="o">=</span> <span class="n">bigpsl</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sampleSeq</span><span class="p">)</span> <span class="o">==</span> <span class="mi">25</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sampleSeq</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>      </div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">JBrowse Archive Creator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Yating Liu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

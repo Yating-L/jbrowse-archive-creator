@@ -1,0 +1,152 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>tracks.TrackStyles &#8212; JBrowse Archive Creator 2.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for tracks.TrackStyles</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">mako.lookup</span> <span class="k">import</span> <span class="n">TemplateLookup</span>
+
+<div class="viewcode-block" id="TrackStyles"><a class="viewcode-back" href="../../source/tracks.html#tracks.TrackStyles.TrackStyles">[docs]</a><span class="k">class</span> <span class="nc">TrackStyles</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tool_directory</span><span class="p">,</span> <span class="n">species_folder</span><span class="p">,</span> <span class="n">trackListFile</span><span class="p">,</span> <span class="n">cssFolderName</span><span class="o">=</span><span class="s2">&quot;css&quot;</span><span class="p">,</span> <span class="n">cssFileName</span><span class="o">=</span><span class="s2">&quot;custom_track_styles.css&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool_directory</span> <span class="o">=</span> <span class="n">tool_directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_folder</span> <span class="o">=</span> <span class="n">species_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trackList</span> <span class="o">=</span> <span class="n">trackListFile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cssFolderName</span> <span class="o">=</span> <span class="n">cssFolderName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cssFileName</span> <span class="o">=</span> <span class="n">cssFileName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cssFilePath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_createCssFile</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cssTemplate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getCssTemplate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_addCssToTrackList</span><span class="p">()</span>
+        
+
+<div class="viewcode-block" id="TrackStyles.addCustomColor"><a class="viewcode-back" href="../../source/tracks.html#tracks.TrackStyles.TrackStyles.addCustomColor">[docs]</a>    <span class="k">def</span> <span class="nf">addCustomColor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_class_name</span><span class="p">,</span> <span class="n">feature_color</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cssFilePath</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">css</span><span class="p">:</span>
+            <span class="n">htmlMakoRendered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cssTemplate</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">feature_class_name</span><span class="p">,</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">feature_color</span>
+        <span class="p">)</span>
+            <span class="n">css</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">htmlMakoRendered</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;create customized track css class: cssFilePath= </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cssFilePath</span><span class="p">)</span></div>
+   
+
+    <span class="k">def</span> <span class="nf">_createCssFile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cssFolderPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">species_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cssFolderName</span><span class="p">)</span>
+        <span class="n">cssFilePath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cssFolderPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cssFileName</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cssFilePath</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cssFolderPath</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cssFolderPath</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mknod</span><span class="p">(</span><span class="n">cssFilePath</span><span class="p">)</span>   
+            <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">cssFilePath</span><span class="p">,</span> <span class="mo">0o755</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cssFilePath</span>
+
+    <span class="k">def</span> <span class="nf">_getCssTemplate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mylookup</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span><span class="n">directories</span><span class="o">=</span><span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_directory</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">)],</span>
+                                  <span class="n">output_encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">encoding_errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+        <span class="n">cssTemplate</span> <span class="o">=</span> <span class="n">mylookup</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;custom_track_styles.css&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cssTemplate</span>
+
+    
+    <span class="k">def</span> <span class="nf">_addCssToTrackList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trackList</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">track</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">track</span><span class="p">)</span>
+            <span class="n">css_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cssFolderName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cssFileName</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;css&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">css_path</span><span class="p">}</span>
+            <span class="n">json_string</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">))</span>
+            <span class="n">track</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">track</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
+            <span class="n">track</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;added customized css url to trackList.json&quot;</span><span class="p">)</span></div>
+        
+
+    
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">JBrowse Archive Creator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Yating Liu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

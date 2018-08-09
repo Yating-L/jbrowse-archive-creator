@@ -1,0 +1,165 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>datatypes.binary package &#8212; JBrowse Archive Creator 2.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="datatypes-binary-package">
+<h1>datatypes.binary package<a class="headerlink" href="#datatypes-binary-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-datatypes.binary.Bam">
+<span id="datatypes-binary-bam-module"></span><h2>datatypes.binary.Bam module<a class="headerlink" href="#module-datatypes.binary.Bam" title="Permalink to this headline">¶</a></h2>
+<p>Class to handle Bam files to UCSC TrackHub</p>
+<dl class="class">
+<dt id="datatypes.binary.Bam.Bam">
+<em class="property">class </em><code class="descclassname">datatypes.binary.Bam.</code><code class="descname">Bam</code><span class="sig-paren">(</span><em>input_bam_false_path</em>, <em>data_bam</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/binary/Bam.html#Bam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.binary.Bam.Bam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#datatypes.binary.Binary.Binary" title="datatypes.binary.Binary.Binary"><code class="xref py py-class docutils literal notranslate"><span class="pre">datatypes.binary.Binary.Binary</span></code></a></p>
+<dl class="method">
+<dt id="datatypes.binary.Bam.Bam.createTrack">
+<code class="descname">createTrack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/binary/Bam.html#Bam.createTrack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.binary.Bam.Bam.createTrack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the final track file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="datatypes.binary.Bam.Bam.validateData">
+<code class="descname">validateData</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/binary/Bam.html#Bam.validateData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.binary.Bam.Bam.validateData" title="Permalink to this definition">¶</a></dt>
+<dd><p>validate the input data with DataValidation</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.binary.BigWig">
+<span id="datatypes-binary-bigwig-module"></span><h2>datatypes.binary.BigWig module<a class="headerlink" href="#module-datatypes.binary.BigWig" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="datatypes.binary.BigWig.BigWig">
+<em class="property">class </em><code class="descclassname">datatypes.binary.BigWig.</code><code class="descname">BigWig</code><span class="sig-paren">(</span><em>input_bigwig_path</em>, <em>data_bigwig</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/binary/BigWig.html#BigWig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.binary.BigWig.BigWig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#datatypes.binary.Binary.Binary" title="datatypes.binary.Binary.Binary"><code class="xref py py-class docutils literal notranslate"><span class="pre">datatypes.binary.Binary.Binary</span></code></a></p>
+<dl class="method">
+<dt id="datatypes.binary.BigWig.BigWig.initSettings">
+<code class="descname">initSettings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/binary/BigWig.html#BigWig.initSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.binary.BigWig.BigWig.initSettings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="datatypes.binary.BigWig.BigWig.validateData">
+<code class="descname">validateData</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/binary/BigWig.html#BigWig.validateData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.binary.BigWig.BigWig.validateData" title="Permalink to this definition">¶</a></dt>
+<dd><p>validate the input data with DataValidation</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.binary.Binary">
+<span id="datatypes-binary-binary-module"></span><h2>datatypes.binary.Binary module<a class="headerlink" href="#module-datatypes.binary.Binary" title="Permalink to this headline">¶</a></h2>
+<p>Super Class of the managed datatype</p>
+<dl class="class">
+<dt id="datatypes.binary.Binary.Binary">
+<em class="property">class </em><code class="descclassname">datatypes.binary.Binary.</code><code class="descname">Binary</code><a class="reference internal" href="../_modules/datatypes/binary/Binary.html#Binary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.binary.Binary.Binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="datatypes.html#datatypes.Datatype.Datatype" title="datatypes.Datatype.Datatype"><code class="xref py py-class docutils literal notranslate"><span class="pre">datatypes.Datatype.Datatype</span></code></a></p>
+<dl class="method">
+<dt id="datatypes.binary.Binary.Binary.createTrack">
+<code class="descname">createTrack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/binary/Binary.html#Binary.createTrack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.binary.Binary.Binary.createTrack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the final track file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="datatypes.binary.Binary.Binary.initSettings">
+<code class="descname">initSettings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/binary/Binary.html#Binary.initSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.binary.Binary.Binary.initSettings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.binary">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-datatypes.binary" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">JBrowse Archive Creator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Yating Liu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      
+      |
+      <a href="../_sources/source/datatypes.binary.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

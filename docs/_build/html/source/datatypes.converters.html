@@ -1,0 +1,229 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>datatypes.converters package &#8212; JBrowse Archive Creator 2.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="datatypes-converters-package">
+<h1>datatypes.converters package<a class="headerlink" href="#datatypes-converters-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-datatypes.converters.BedConversion">
+<span id="datatypes-converters-bedconversion-module"></span><h2>datatypes.converters.BedConversion module<a class="headerlink" href="#module-datatypes.converters.BedConversion" title="Permalink to this headline">¶</a></h2>
+<p>Convert BED format to gff3
+reference for gff3: <a class="reference external" href="https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md">https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md</a></p>
+<dl class="class">
+<dt id="datatypes.converters.BedConversion.BedConversion">
+<em class="property">class </em><code class="descclassname">datatypes.converters.BedConversion.</code><code class="descname">BedConversion</code><span class="sig-paren">(</span><em>inputBedFile</em>, <em>outputFile</em>, <em>chromSizesFile</em>, <em>bedType</em>, <em>trackType</em>, <em>options=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/BedConversion.html#BedConversion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.BedConversion.BedConversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#datatypes.converters.DataConversion.DataConversion" title="datatypes.converters.DataConversion.DataConversion"><code class="xref py py-class docutils literal notranslate"><span class="pre">datatypes.converters.DataConversion.DataConversion</span></code></a></p>
+<dl class="method">
+<dt id="datatypes.converters.BedConversion.BedConversion.bigpsl_to_gff3">
+<code class="descname">bigpsl_to_gff3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/BedConversion.html#BedConversion.bigpsl_to_gff3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.BedConversion.BedConversion.bigpsl_to_gff3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="datatypes.converters.BedConversion.BedConversion.convertFormats">
+<code class="descname">convertFormats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/BedConversion.html#BedConversion.convertFormats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.BedConversion.BedConversion.convertFormats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert data into JBrowse track</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="datatypes.converters.BedConversion.BedConversion.convertToGff3">
+<code class="descname">convertToGff3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/BedConversion.html#BedConversion.convertToGff3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.BedConversion.BedConversion.convertToGff3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="datatypes.converters.BedConversion.BedConversion.dataToJson">
+<code class="descname">dataToJson</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/BedConversion.html#BedConversion.dataToJson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.BedConversion.BedConversion.dataToJson" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="datatypes.converters.BedConversion.BedConversion.splicejunctions_to_gff3">
+<code class="descname">splicejunctions_to_gff3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/BedConversion.html#BedConversion.splicejunctions_to_gff3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.BedConversion.BedConversion.splicejunctions_to_gff3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="datatypes.converters.BedConversion.BedConversion.trfbig_to_gff3">
+<code class="descname">trfbig_to_gff3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/BedConversion.html#BedConversion.trfbig_to_gff3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.BedConversion.BedConversion.trfbig_to_gff3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.converters.DataConversion">
+<span id="datatypes-converters-dataconversion-module"></span><h2>datatypes.converters.DataConversion module<a class="headerlink" href="#module-datatypes.converters.DataConversion" title="Permalink to this headline">¶</a></h2>
+<p>This class handles the subprocess calls of the different tools used
+in HubArchiveCreator</p>
+<dl class="class">
+<dt id="datatypes.converters.DataConversion.DataConversion">
+<em class="property">class </em><code class="descclassname">datatypes.converters.DataConversion.</code><code class="descname">DataConversion</code><span class="sig-paren">(</span><em>inputFile</em>, <em>outputFile</em>, <em>chromSizesFile</em>, <em>operateType</em>, <em>options=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/DataConversion.html#DataConversion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.DataConversion.DataConversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="datatypes.converters.DataConversion.DataConversion.CONVERT_OPERATIONS">
+<code class="descname">CONVERT_OPERATIONS</code><em class="property"> = {('bed', 'gff'): 'bedtogff3', ('blastxml', 'gff'): 'blastxmltogff3', ('gtf', 'gff'): 'gtftogff3'}</em><a class="headerlink" href="#datatypes.converters.DataConversion.DataConversion.CONVERT_OPERATIONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="datatypes.converters.DataConversion.DataConversion.convertFormats">
+<code class="descname">convertFormats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/DataConversion.html#DataConversion.convertFormats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.DataConversion.DataConversion.convertFormats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert data into JBrowse track</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.converters.bedToGff3">
+<span id="datatypes-converters-bedtogff3-module"></span><h2>datatypes.converters.bedToGff3 module<a class="headerlink" href="#module-datatypes.converters.bedToGff3" title="Permalink to this headline">¶</a></h2>
+<p>Convert BED format to gff3
+reference for gff3: <a class="reference external" href="https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md">https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md</a></p>
+<dl class="function">
+<dt id="datatypes.converters.bedToGff3.bedToGff3">
+<code class="descclassname">datatypes.converters.bedToGff3.</code><code class="descname">bedToGff3</code><span class="sig-paren">(</span><em>inputBedFile</em>, <em>chrom_sizes</em>, <em>output</em>, <em>bed_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/bedToGff3.html#bedToGff3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.bedToGff3.bedToGff3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="datatypes.converters.bedToGff3.bigpsl_to_gff3">
+<code class="descclassname">datatypes.converters.bedToGff3.</code><code class="descname">bigpsl_to_gff3</code><span class="sig-paren">(</span><em>inputBedFile</em>, <em>chrom_sizes</em>, <em>output</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/bedToGff3.html#bigpsl_to_gff3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.bedToGff3.bigpsl_to_gff3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="datatypes.converters.bedToGff3.splicejunctions_to_gff3">
+<code class="descclassname">datatypes.converters.bedToGff3.</code><code class="descname">splicejunctions_to_gff3</code><span class="sig-paren">(</span><em>inputBedFile</em>, <em>chrom_sizes</em>, <em>output</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/bedToGff3.html#splicejunctions_to_gff3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.bedToGff3.splicejunctions_to_gff3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="datatypes.converters.bedToGff3.trfbig_to_gff3">
+<code class="descclassname">datatypes.converters.bedToGff3.</code><code class="descname">trfbig_to_gff3</code><span class="sig-paren">(</span><em>inputBedFile</em>, <em>chrom_sizes</em>, <em>output</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/bedToGff3.html#trfbig_to_gff3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.bedToGff3.trfbig_to_gff3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.converters.blastxmlToGff3">
+<span id="datatypes-converters-blastxmltogff3-module"></span><h2>datatypes.converters.blastxmlToGff3 module<a class="headerlink" href="#module-datatypes.converters.blastxmlToGff3" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="datatypes.converters.blastxmlToGff3.align2cigar">
+<code class="descclassname">datatypes.converters.blastxmlToGff3.</code><code class="descname">align2cigar</code><span class="sig-paren">(</span><em>hsp_query</em>, <em>hsp_reference</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/blastxmlToGff3.html#align2cigar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.blastxmlToGff3.align2cigar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build CIGAR representation from an hsp_query
+input:</p>
+<blockquote>
+<div>hsp_query
+hsp_sbjct</div></blockquote>
+<dl class="docutils">
+<dt>output:</dt>
+<dd>CIGAR string</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="datatypes.converters.blastxmlToGff3.blastxmlToGff3">
+<code class="descclassname">datatypes.converters.blastxmlToGff3.</code><code class="descname">blastxmlToGff3</code><span class="sig-paren">(</span><em>xml_file</em>, <em>gff3_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/blastxmlToGff3.html#blastxmlToGff3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.blastxmlToGff3.blastxmlToGff3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="datatypes.converters.blastxmlToGff3.gff3_writer">
+<code class="descclassname">datatypes.converters.blastxmlToGff3.</code><code class="descname">gff3_writer</code><span class="sig-paren">(</span><em>blast_records</em>, <em>gff3_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/blastxmlToGff3.html#gff3_writer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.blastxmlToGff3.gff3_writer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.converters.gtfToGff3">
+<span id="datatypes-converters-gtftogff3-module"></span><h2>datatypes.converters.gtfToGff3 module<a class="headerlink" href="#module-datatypes.converters.gtfToGff3" title="Permalink to this headline">¶</a></h2>
+<p>Convert GTF format to GFF3
+reference for gff3: <a class="reference external" href="https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md">https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md</a></p>
+<dl class="function">
+<dt id="datatypes.converters.gtfToGff3.gtfToGff3">
+<code class="descclassname">datatypes.converters.gtfToGff3.</code><code class="descname">gtfToGff3</code><span class="sig-paren">(</span><em>gtf_file</em>, <em>gff3_file</em>, <em>chrom_sizes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/converters/gtfToGff3.html#gtfToGff3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.converters.gtfToGff3.gtfToGff3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covert gtf file output from StringTie to gff3 format</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.converters">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-datatypes.converters" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">JBrowse Archive Creator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Yating Liu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      
+      |
+      <a href="../_sources/source/datatypes.converters.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

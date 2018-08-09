@@ -1,0 +1,163 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>util.santitizer &#8212; JBrowse Archive Creator 2.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for util.santitizer</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python</span>
+<span class="c1"># -*- coding: utf8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This class handles the subprocess calls of the different tools used</span>
+<span class="sd">in HubArchiveCreator</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+    
+<div class="viewcode-block" id="prefixTrackName"><a class="viewcode-back" href="../../source/util.html#util.santitizer.prefixTrackName">[docs]</a><span class="k">def</span> <span class="nf">prefixTrackName</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>       
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    santitize trackName. Because track name must begin with a letter and</span>
+<span class="sd">    contain only the following chars: [a-zA-Z0-9_].</span>
+<span class="sd">    See the &quot;track&quot; Common settings at:</span>
+<span class="sd">    https://genome.ucsc.edu/goldenpath/help/trackDb/trackDbHub.html#bigPsl_-_Pairwise_Alignments</span>
+<span class="sd">    skip the santitization for cytoBandIdeo track</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">filename</span> <span class="o">==</span> <span class="s1">&#39;cytoBandIdeo&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">filename</span>
+    <span class="n">valid_chars</span> <span class="o">=</span> <span class="s2">&quot;_</span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">)</span>
+    <span class="n">sanitize_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">c</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">valid_chars</span> <span class="k">else</span> <span class="s1">&#39;_&#39;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">])</span>
+    <span class="n">sanitize_name</span> <span class="o">=</span> <span class="s2">&quot;gonramp_&quot;</span> <span class="o">+</span> <span class="n">sanitize_name</span>
+    <span class="k">return</span> <span class="n">sanitize_name</span></div>
+
+<div class="viewcode-block" id="sanitize_name_input"><a class="viewcode-back" href="../../source/util.html#util.santitizer.sanitize_name_input">[docs]</a><span class="k">def</span> <span class="nf">sanitize_name_input</span><span class="p">(</span><span class="n">string_to_sanitize</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sanitize the string passed in parameter by replacing &#39;/&#39; and &#39; &#39; by &#39;_&#39;</span>
+
+<span class="sd">    :param string_to_sanitize:</span>
+<span class="sd">    :return :</span>
+
+<span class="sd">    :Example:</span>
+
+<span class="sd">    &gt;&gt;&gt; sanitize_name_input(&#39;this/is an//example&#39;)</span>
+<span class="sd">    this_is_an__example</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">string_to_sanitize</span> \
+            <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> \
+            <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="sanitize_name_inputs"><a class="viewcode-back" href="../../source/util.html#util.santitizer.sanitize_name_inputs">[docs]</a><span class="k">def</span> <span class="nf">sanitize_name_inputs</span><span class="p">(</span><span class="n">inputs_data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sanitize value of the keys &quot;name&quot; of the dictionary passed in parameter.</span>
+
+<span class="sd">    Because sometimes output from Galaxy, or even just file name, from user inputs, have spaces.</span>
+<span class="sd">    Also, it can contain &#39;/&#39; character and could break the use of os.path function.</span>
+
+<span class="sd">    :param inputs_data: dict[string, dict[string, string]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">inputs_data</span><span class="p">:</span>
+        <span class="n">inputs_data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sanitize_name_input</span><span class="p">(</span><span class="n">inputs_data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="sanitize_group_name"><a class="viewcode-back" href="../../source/util.html#util.santitizer.sanitize_group_name">[docs]</a><span class="k">def</span> <span class="nf">sanitize_group_name</span><span class="p">(</span><span class="n">group_name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">group_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="sanitize_name"><a class="viewcode-back" href="../../source/util.html#util.santitizer.sanitize_name">[docs]</a><span class="k">def</span> <span class="nf">sanitize_name</span><span class="p">(</span><span class="n">input_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Galaxy will name all the files and dirs as *.dat, </span>
+<span class="sd">    the function can replace &#39;.&#39; to &#39;_&#39; for the dirs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">validChars</span> <span class="o">=</span> <span class="s2">&quot;_-</span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">)</span>
+    <span class="n">sanitized_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">c</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">validChars</span> <span class="k">else</span> <span class="s1">&#39;_&#39;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">input_name</span><span class="p">])</span>
+    <span class="k">return</span> <span class="s2">&quot;gonramp_&quot;</span> <span class="o">+</span> <span class="n">sanitized_name</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">JBrowse Archive Creator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Yating Liu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

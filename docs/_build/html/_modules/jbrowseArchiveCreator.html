@@ -1,0 +1,176 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>jbrowseArchiveCreator &#8212; JBrowse Archive Creator 2.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for jbrowseArchiveCreator</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This Galaxy tool permits to prepare your files to be ready for JBrowse visualization.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+
+
+<span class="c1"># Internal dependencies</span>
+<span class="kn">from</span> <span class="nn">util.Reader</span> <span class="k">import</span> <span class="n">Reader</span>
+<span class="kn">from</span> <span class="nn">util.Logger</span> <span class="k">import</span> <span class="n">Logger</span> 
+<span class="kn">from</span> <span class="nn">TrackHub</span> <span class="k">import</span> <span class="n">TrackHub</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../source/jbrowseArchiveCreator.html#jbrowseArchiveCreator.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Create a hub to display in jbrowse.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-j&#39;</span><span class="p">,</span> <span class="s1">&#39;--data_json&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;JSON file containing the metadata of the inputs&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--output&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Name of the HTML summarizing the content of the JBrowse Hub Archive&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Get the args passed in parameter</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">json_inputs_data</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">data_json</span>
+    <span class="n">outputFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">output</span>
+
+    <span class="c1">##Parse JSON file with Reader</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">Reader</span><span class="p">(</span><span class="n">json_inputs_data</span><span class="p">)</span>
+
+    <span class="c1"># Begin init variables</span>
+    <span class="n">extra_files_path</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">getExtFilesPath</span><span class="p">()</span>
+    <span class="n">toolDirectory</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">getToolDir</span><span class="p">()</span>
+    <span class="c1">#outputFile = reader.getOutputDir()</span>
+    <span class="n">user_email</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">getUserEmail</span><span class="p">()</span>
+    <span class="n">reference_genome</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">getRefGenome</span><span class="p">()</span>
+    <span class="n">debug_mode</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">getDebugMode</span><span class="p">()</span>
+    <span class="n">track_type</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">getTrackType</span><span class="p">()</span>
+    
+ 
+    <span class="c1">#### Logging management ####</span>
+    <span class="c1"># If we are in Debug mode, also print in stdout the debug dump</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="n">tool_directory</span><span class="o">=</span><span class="n">toolDirectory</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug_mode</span><span class="p">,</span> <span class="n">extra_files_path</span><span class="o">=</span><span class="n">extra_files_path</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">setup_logging</span><span class="p">()</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;#### JBrowseArchiveCreator: Start ####</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;---- Welcome in JBrowseArchiveCreator Debug Mode ----</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;JSON parameters: </span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">args</span><span class="p">))</span>
+    <span class="c1">#### END Logging management ####</span>
+ 
+    <span class="c1"># Create the Track Hub folder</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;#### JBrowseArchiveCreator: Creating the Track Hub folder ####</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">trackHub</span> <span class="o">=</span> <span class="n">TrackHub</span><span class="p">(</span><span class="n">reference_genome</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">,</span> <span class="n">extra_files_path</span><span class="p">,</span> <span class="n">toolDirectory</span><span class="p">,</span> <span class="n">track_type</span><span class="p">)</span> 
+
+    <span class="c1"># Create Ordered Dictionary to add the tracks in the tool form order</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;#### JBrowseArchiveCreator: Preparing track data ####</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">all_datatype_dictionary</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">getTracksData</span><span class="p">()</span>
+    <span class="n">all_datatype_ordered_dictionary</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">all_datatype_dictionary</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;----- End of all_datatype_dictionary processing -----&quot;</span><span class="p">)</span>
+    <span class="c1">#logging.debug(&quot;all_datatype_ordered_dictionary are: %s&quot;, json.dumps(all_datatype_ordered_dictionary))</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;#### JBrowseArchiveCreator: Adding tracks to Track Hub ####</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;----- Beginning of Track adding processing -----&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">datatypeObject</span> <span class="ow">in</span> <span class="n">all_datatype_ordered_dictionary</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="n">trackHub</span><span class="o">.</span><span class="n">addTrack</span><span class="p">(</span><span class="n">datatypeObject</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">track_db</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;----- End of Track adding processing -----&quot;</span><span class="p">)</span>
+
+    <span class="c1"># We terminate the process and so create a HTML file summarizing all the files</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;#### JBrowseArchiveCreator: Creating the HTML file ####</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">trackHub</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="n">debug_mode</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;---- End of JBrowseArchiveCreator Debug Mode: Bye! ----</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;#### JBrowseArchiveCreator: Congratulation! Assembly Hub is created! ####</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">JBrowse Archive Creator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Yating Liu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

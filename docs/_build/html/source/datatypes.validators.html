@@ -1,0 +1,190 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>datatypes.validators package &#8212; JBrowse Archive Creator 2.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="datatypes-validators-package">
+<h1>datatypes.validators package<a class="headerlink" href="#datatypes-validators-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-datatypes.validators.DataValidation">
+<span id="datatypes-validators-datavalidation-module"></span><h2>datatypes.validators.DataValidation module<a class="headerlink" href="#module-datatypes.validators.DataValidation" title="Permalink to this headline">¶</a></h2>
+<p>This class handles the subprocess calls of the different tools used
+in HubArchiveCreator</p>
+<dl class="class">
+<dt id="datatypes.validators.DataValidation.DataValidation">
+<em class="property">class </em><code class="descclassname">datatypes.validators.DataValidation.</code><code class="descname">DataValidation</code><span class="sig-paren">(</span><em>inputFile</em>, <em>fileType</em>, <em>chromSizesFile</em>, <em>options=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/validators/DataValidation.html#DataValidation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.validators.DataValidation.DataValidation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="datatypes.validators.DataValidation.DataValidation.BED_TYPE">
+<code class="descname">BED_TYPE</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#datatypes.validators.DataValidation.DataValidation.BED_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="datatypes.validators.DataValidation.DataValidation.BIGBED_TYPE">
+<code class="descname">BIGBED_TYPE</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#datatypes.validators.DataValidation.DataValidation.BIGBED_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="datatypes.validators.DataValidation.DataValidation.FILE_TYPE">
+<code class="descname">FILE_TYPE</code><em class="property"> = ['fasta', 'fastq', 'bam', 'bigwig', 'bed', 'bigbed', 'bedgraph']</em><a class="headerlink" href="#datatypes.validators.DataValidation.DataValidation.FILE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="datatypes.validators.DataValidation.DataValidation.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/validators/DataValidation.html#DataValidation.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.validators.DataValidation.DataValidation.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>validate input file format</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.validators.Gff3Validation">
+<span id="datatypes-validators-gff3validation-module"></span><h2>datatypes.validators.Gff3Validation module<a class="headerlink" href="#module-datatypes.validators.Gff3Validation" title="Permalink to this headline">¶</a></h2>
+<p>This class handles the subprocess calls of the different tools used
+in HubArchiveCreator</p>
+<dl class="class">
+<dt id="datatypes.validators.Gff3Validation.Gff3Validation">
+<em class="property">class </em><code class="descclassname">datatypes.validators.Gff3Validation.</code><code class="descname">Gff3Validation</code><span class="sig-paren">(</span><em>inputFile</em>, <em>fileType</em>, <em>chromSizesFile</em>, <em>options=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/validators/Gff3Validation.html#Gff3Validation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.validators.Gff3Validation.Gff3Validation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#datatypes.validators.DataValidation.DataValidation" title="datatypes.validators.DataValidation.DataValidation"><code class="xref py py-class docutils literal notranslate"><span class="pre">datatypes.validators.DataValidation.DataValidation</span></code></a></p>
+<dl class="method">
+<dt id="datatypes.validators.Gff3Validation.Gff3Validation.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/validators/Gff3Validation.html#Gff3Validation.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.validators.Gff3Validation.Gff3Validation.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>validate input file format</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.validators.GtfValidation">
+<span id="datatypes-validators-gtfvalidation-module"></span><h2>datatypes.validators.GtfValidation module<a class="headerlink" href="#module-datatypes.validators.GtfValidation" title="Permalink to this headline">¶</a></h2>
+<p>This class handles the subprocess calls of the different tools used
+in HubArchiveCreator</p>
+<dl class="class">
+<dt id="datatypes.validators.GtfValidation.GtfValidation">
+<em class="property">class </em><code class="descclassname">datatypes.validators.GtfValidation.</code><code class="descname">GtfValidation</code><span class="sig-paren">(</span><em>inputFile</em>, <em>fileType</em>, <em>chromSizesFile</em>, <em>options=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/validators/GtfValidation.html#GtfValidation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.validators.GtfValidation.GtfValidation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#datatypes.validators.DataValidation.DataValidation" title="datatypes.validators.DataValidation.DataValidation"><code class="xref py py-class docutils literal notranslate"><span class="pre">datatypes.validators.DataValidation.DataValidation</span></code></a></p>
+<dl class="method">
+<dt id="datatypes.validators.GtfValidation.GtfValidation.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/validators/GtfValidation.html#GtfValidation.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.validators.GtfValidation.GtfValidation.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>validate input file format</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.validators.PslValidation">
+<span id="datatypes-validators-pslvalidation-module"></span><h2>datatypes.validators.PslValidation module<a class="headerlink" href="#module-datatypes.validators.PslValidation" title="Permalink to this headline">¶</a></h2>
+<p>This class handles the subprocess calls of the different tools used
+in HubArchiveCreator</p>
+<dl class="class">
+<dt id="datatypes.validators.PslValidation.PslValidation">
+<em class="property">class </em><code class="descclassname">datatypes.validators.PslValidation.</code><code class="descname">PslValidation</code><span class="sig-paren">(</span><em>inputFile</em>, <em>fileType</em>, <em>chromSizesFile</em>, <em>options=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/validators/PslValidation.html#PslValidation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.validators.PslValidation.PslValidation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#datatypes.validators.DataValidation.DataValidation" title="datatypes.validators.DataValidation.DataValidation"><code class="xref py py-class docutils literal notranslate"><span class="pre">datatypes.validators.DataValidation.DataValidation</span></code></a></p>
+<dl class="method">
+<dt id="datatypes.validators.PslValidation.PslValidation.pslCheck">
+<code class="descname">pslCheck</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/validators/PslValidation.html#PslValidation.pslCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.validators.PslValidation.PslValidation.pslCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="datatypes.validators.PslValidation.PslValidation.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/datatypes/validators/PslValidation.html#PslValidation.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#datatypes.validators.PslValidation.PslValidation.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>validate input file format</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-datatypes.validators">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-datatypes.validators" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">JBrowse Archive Creator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Yating Liu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      
+      |
+      <a href="../_sources/source/datatypes.validators.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
